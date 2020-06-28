@@ -1,8 +1,6 @@
-browser.tabs.onCreated.addListener((_) => {
+browser.tabs.onCreated.addListener(async (_) => {
   console.log("new tab!")
-  browser.contextualIdentities.query({}).then(identities => {
-    identities.forEach(id => console.log(id))
-  })
-})
+  const identities = await browser.contextualIdentities.query({});
 
-browser.storage.local.set({ foo: "bar" })
+  identities.forEach(id => console.log(id))
+})

@@ -1,7 +1,19 @@
-browser.tabs.onCreated.addListener(async (_) => {
-  console.log("new tab!")
+browser.storage.local.get("mappings").then((res) => {
+  console.log(JSON.parse(res.mappings))
+})
 
-  const identities = await browser.contextualIdentities.query({})
+browser.storage.onChanged.addListener((changes, areaName) => {
+  console.log("changes: ", changes)
+  console.log("areaName: ", areaName)
+})
 
-  identities.forEach((id) => console.log(id))
+browser.tabs.onUpdated.addListener(async (id, changeInfo, tab) => {
+  if (changeInfo.status === "loading") {
+    console.log("tab updated!")
+    console.log("id: ", id)
+    console.log("changeInfo: ", changeInfo)
+    console.log("tab: ", tab)
+  }
+  // const identities = await browser.contextualIdentities.query({})
+  // identities.forEach((id) => console.log(id))
 })

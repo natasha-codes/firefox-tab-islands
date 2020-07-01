@@ -1,13 +1,17 @@
+const getMappingsArea = (): HTMLTextAreaElement =>
+  <HTMLTextAreaElement>document.querySelector("#mappings")
+
 function saveOptions(e) {
   e.preventDefault()
   browser.storage.local.set({
-    mappings: document.querySelector("#mappings").value,
+    mappings: (<HTMLTextAreaElement>document.querySelector("#mappings")).value,
   })
 }
 
 function restoreOptions() {
   function setCurrentChoice(result) {
-    document.querySelector("#mappings").value = result.mappings || {}
+    ;(<HTMLTextAreaElement>document.querySelector("#mappings")).value =
+      result.mappings || {}
   }
 
   let getting = browser.storage.local.get("mappings")

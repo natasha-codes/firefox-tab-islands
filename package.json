@@ -10,10 +10,14 @@
   ],
   "license": "MIT",
   "scripts": {
-    "build": "tsc"
+    "build": "yarn build:background && yarn build:content && yarn build:options",
+    "build:background": "tsc -p tsconfig.background.json",
+    "build:content": "tsc -p tsconfig.content.json",
+    "build:options": "tsc -p tsconfig.options.json"
   },
   "devDependencies": {
     "@types/firefox-webext-browser": "^78.0.0",
+    "prettier": "^2.0.5",
     "typescript": "^3.9.5"
   }
 }

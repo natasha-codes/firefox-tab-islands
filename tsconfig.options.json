@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "lib": ["ES2020", "DOM"],
+    "outFile": "./build/options.js"
+  },
+  "include": [
+    "src/options/**/*.ts"
+  ]
+}

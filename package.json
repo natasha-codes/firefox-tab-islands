@@ -2,10 +2,16 @@
   "name": "firefox-islands",
   "version": "0.0.1",
   "description": "A config-based wrapper around Firefox's contextualidentities API",
-  "main": "index.js",
   "repository": "git@github.com:natasha-codes/firefox-islands.git",
-  "author": "Nathan Shelly <nsnshelly@gmail.com>",
+  "author": "natasha-codes <https://github.com/natasha-codes>",
+  "contributors": [
+    "Nathan Shelly (https://nathanshelly.dev)",
+    "Sasha Weiss (https://asashaweiss.com)"
+  ],
   "license": "MIT",
+  "scripts": {
+    "build": "tsc"
+  },
   "devDependencies": {
     "@types/firefox-webext-browser": "^78.0.0",
     "typescript": "^3.9.5"

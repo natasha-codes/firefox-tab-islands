@@ -10,12 +10,12 @@
   "homepage_url": "https://github.com/natasha-codes/firefox-islands",
   "permissions": ["contextualIdentities", "cookies", "tabs"],
   "background": {
-    "scripts": ["./src/background.js"]
+    "scripts": ["./build/background.js"]
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["./src/content.js"]
+      "js": ["./build/content.js"]
     }
   ]
 }

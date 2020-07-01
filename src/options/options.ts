@@ -1,21 +1,24 @@
 const getMappingsArea = (): HTMLTextAreaElement =>
-  <HTMLTextAreaElement>document.querySelector("#mappings")
+    <HTMLTextAreaElement>document.querySelector("#mappings")
 
-function saveOptions(e) {
-  e.preventDefault()
-  browser.storage.local.set({
-    mappings: (<HTMLTextAreaElement>document.querySelector("#mappings")).value,
-  })
+const logError = (e: Error) => console.log(`Error: ${e}`)
+
+function saveOptions(e: Event) {
+    e.preventDefault()
+
+    browser.storage.local
+        .set({
+            mappings: getMappingsArea().value,
+        })
+        .catch(logError)
 }
 
 function restoreOptions() {
-  function setCurrentChoice(result) {
-    ;(<HTMLTextAreaElement>document.querySelector("#mappings")).value =
-      result.mappings || {}
-  }
+    const setCurrentChoice = (result: {[key: string]: any}) => {
+        getMappingsArea().value = result["mappings"] || {}
+    }
 
-  let getting = browser.storage.local.get("mappings")
-  getting.then(setCurrentChoice, (e) => console.log(`Error: ${e}`))
+    browser.storage.local.get("mappings").then(setCurrentChoice, logError)
 }
 
 document.addEventListener("DOMContentLoaded", restoreOptions)

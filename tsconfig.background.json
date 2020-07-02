@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "lib": ["ES2020", "DOM"],
-    "outFile": "./build/background.js"
-  },
-  "include": [
-    "src/background/**/*.ts"
-  ]
-}

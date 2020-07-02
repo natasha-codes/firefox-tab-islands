@@ -1,23 +1,31 @@
 {
-  "name": "firefox-islands",
-  "version": "0.0.1",
-  "description": "A config-based wrapper around Firefox's contextualidentities API",
-  "repository": "git@github.com:natasha-codes/firefox-islands.git",
-  "author": "natasha-codes <https://github.com/natasha-codes>",
-  "contributors": [
-    "Nathan Shelly (https://nathanshelly.dev)",
-    "Sasha Weiss (https://asashaweiss.com)"
-  ],
-  "license": "MIT",
-  "scripts": {
-    "build": "yarn build:background && yarn build:content && yarn build:options",
-    "build:background": "tsc -p tsconfig.background.json",
-    "build:content": "tsc -p tsconfig.content.json",
-    "build:options": "tsc -p tsconfig.options.json"
-  },
-  "devDependencies": {
-    "@types/firefox-webext-browser": "^78.0.0",
-    "prettier": "^2.0.5",
-    "typescript": "^3.9.5"
-  }
+    "name": "firefox-islands",
+    "version": "0.0.1",
+    "description": "A config-based wrapper around Firefox's contextualidentities API",
+    "repository": "git@github.com:natasha-codes/firefox-islands.git",
+    "author": "natasha-codes <https://github.com/natasha-codes>",
+    "contributors": [
+        "Nathan Shelly (https://nathanshelly.dev)",
+        "Sasha Weiss (https://asashaweiss.com)"
+    ],
+    "license": "MIT",
+    "scripts": {
+        "build": "gulp build",
+        "build:background": "gulp build:background",
+        "build:content": "gulp build:content",
+        "build:options": "gulp build:options"
+    },
+    "devDependencies": {
+        "@types/browserify": "^12.0.36",
+        "@types/firefox-webext-browser": "^78.0.0",
+        "@types/gulp": "^4.0.6",
+        "@types/vinyl-source-stream": "^0.0.30",
+        "browserify": "^16.5.1",
+        "gulp": "^4.0.2",
+        "prettier": "^2.0.5",
+        "ts-node": "^8.10.2",
+        "tsify": "^4.0.2",
+        "typescript": "^3.9.5",
+        "vinyl-source-stream": "^2.0.0"
+    }
 }

@@ -1,25 +1,29 @@
-const getMappingsArea = (): HTMLTextAreaElement =>
-    <HTMLTextAreaElement>document.querySelector("#mappings")
+/**
+ * Handle mappings JSON upload, storing the mappings in local storage
+ *
+ * ref - https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Working_with_files#Open_files_in_an_extension_using_a_file_picker
+ */
 
-const logError = (e: Error) => console.log(`Error: ${e}`)
+// NOTE: this cannot be defined as a lambda function as we will then not have
+// access to the correct proprty on this
+function handleFiles() {
+    // returns an array of files even when only one uploaded
+    const file = this.files[0]
 
-function saveOptions(e: Event) {
-    e.preventDefault()
+    const reader = new FileReader()
 
-    browser.storage.local
-        .set({
-            mappings: getMappingsArea().value,
+    reader.onload = (loaded) => {
+        // `string` here because we call `readAsText` below (don't love the api)
+        const parsed = JSON.parse(loaded.target.result as string)
+
+        browser.storage.local.set({
+            mappings: parsed,
         })
-        .catch(logError)
-}
-
-function restoreOptions() {
-    const setCurrentChoice = (result: {[key: string]: any}) => {
-        getMappingsArea().value = result["mappings"] || {}
     }
 
-    browser.storage.local.get("mappings").then(setCurrentChoice, logError)
+    reader.readAsText(file)
 }
 
-document.addEventListener("DOMContentLoaded", restoreOptions)
-document.querySelector("form").addEventListener("submit", saveOptions)
+document
+    .getElementById("mappingsJSON")
+    .addEventListener("change", handleFiles, false)

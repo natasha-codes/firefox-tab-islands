@@ -1,3 +1,5 @@
+export type CookieStoreId = string
+
 export class StorageManager {
     public static shared: StorageManager = new StorageManager()
 
@@ -7,17 +9,22 @@ export class StorageManager {
     private constructor() {}
 
     public async attach(): Promise<void> {
-        return browser.storage.local
-            .get(StorageManager.mappingsKey)
-            .then((res) => {
-                const mappings = res[StorageManager.mappingsKey]
+        const storedMappings = await browser.storage.local.get(
+            StorageManager.mappingsKey,
+        )
 
-                this._mappings =
-                    mappings === undefined ? {} : JSON.parse(mappings)
-            })
+        const mappings = storedMappings[StorageManager.mappingsKey]
+
+        this._mappings = mappings === undefined ? {} : JSON.parse(mappings)
     }
 
     public mappings(): {[key: string]: string} {
         return this._mappings
+    }
+
+    public async getMappedCookieStoreForUrl(
+        url: string,
+    ): Promise<null | CookieStoreId> {
+        return null
     }
 }

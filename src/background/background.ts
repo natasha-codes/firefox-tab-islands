@@ -1,15 +1,11 @@
-import {RequestListener} from "./RequestListener"
 import {StorageManager} from "./StorageManager"
+import {IslandRouter} from "./IslandRouter"
 
-StorageManager.shared
-    .attach()
-    .then(() => {
-        console.log("mappings:")
-        console.log(StorageManager.shared.mappings())
-    })
-    .then(() => {
-        return new Promise((resolve) => {
-            RequestListener.shared.attach()
-            resolve()
-        })
-    })
+const main = async () => {
+    await StorageManager.shared.attach()
+    console.log(StorageManager.shared.mappings())
+
+    IslandRouter.shared.attach()
+}
+
+main()

@@ -60,7 +60,7 @@ export class IslandRouter {
                 details.url,
             )) ?? Constants.defaultCookieStoreId
 
-        if (!!details.cookieStoreId) {
+        if (!details.cookieStoreId) {
             const message = `Missing cookie store ID for request with URL: ${details.url}`
             console.error(message)
         }

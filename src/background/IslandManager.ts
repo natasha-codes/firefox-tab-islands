@@ -5,33 +5,31 @@ export type CookieStoreId = string
 export class IslandManager {
     public static shared: IslandManager = new IslandManager()
 
-    private _islandNameToCookieStoreIdMappings: StringToStringMap = {}
-    private _mappings: StringToStringMap = {}
+    private _islandNameToCookieStoreIdRoutes: StringToStringMap = {}
+    private _routes: StringToStringMap = {}
 
     private constructor() {}
 
     public async attach(): Promise<void> {
-        this.updateMappings()
+        this.updateRoutes()
 
         browser.storage.onChanged.addListener(this.onStorageEvent)
     }
 
     public getMappedCookieStoreForUrl(url: string): null | CookieStoreId {
-        const mappings = this._mappings
+        const routes = this._routes
 
         const firstMatchingMappingKey = Object.keys(
-            mappings,
+            routes,
         ).find((urlFragment) => url.includes(urlFragment))
 
         if (!firstMatchingMappingKey) {
             return null
         }
 
-        const islandName = mappings[firstMatchingMappingKey]
+        const islandName = routes[firstMatchingMappingKey]
 
-        const cookieStoreId = this._islandNameToCookieStoreIdMappings[
-            islandName
-        ]
+        const cookieStoreId = this._islandNameToCookieStoreIdRoutes[islandName]
 
         if (!cookieStoreId) {
             console.error(
@@ -42,16 +40,16 @@ export class IslandManager {
         return cookieStoreId
     }
 
-    private async updateMappings() {
-        const storedMappings = await browser.storage.local.get(
-            Constants.mappingsStorageKey,
+    private async updateRoutes() {
+        const storedRoutes = await browser.storage.local.get(
+            Constants.routesStorageKey,
         )
 
-        const mappings = storedMappings[Constants.mappingsStorageKey]
+        const routes = storedRoutes[Constants.routesStorageKey]
 
-        this._mappings = mappings ?? {}
+        this._routes = routes ?? {}
 
-        this.createContextualIdentitiesMappings()
+        this.createContextualIdentitiesRoutes()
     }
 
     private onStorageEvent = async (
@@ -62,17 +60,17 @@ export class IslandManager {
             return
         }
 
-        const mappingChanges = changes?.mappings
+        const mappingChanges = changes?.routes
         if (mappingChanges) {
             this.removeUnmappedContextualIdentities(mappingChanges)
 
-            this.updateMappings()
+            this.updateRoutes()
         }
     }
 
     /**
-     * create a map of contextual identity names from user mappings (e.g.
-     * "the_goog") to cookieStoreId (serves as a unique identifier for the
+     * create a map from island names (e.g. * "the_goog") from user
+     * routes to cookieStoreId (serves as a unique identifier for the
      * contextual identity)
      *
      * this function ensures that there exists a contextual identity for every
@@ -81,8 +79,8 @@ export class IslandManager {
      * if there already exists an island with the associated name store that
      * mapping, else create a new one
      */
-    private createContextualIdentitiesMappings() {
-        const uniqueIslandNames = new Set(Object.values(this._mappings))
+    private createContextualIdentitiesRoutes() {
+        const uniqueIslandNames = new Set(Object.values(this._routes))
 
         uniqueIslandNames.forEach(async (name) => {
             const matchingContextualIdentities = await browser.contextualIdentities.query(
@@ -92,7 +90,7 @@ export class IslandManager {
             if (!!matchingContextualIdentities.length) {
                 const firstMatch = matchingContextualIdentities[0]
 
-                this._islandNameToCookieStoreIdMappings[name] =
+                this._islandNameToCookieStoreIdRoutes[name] =
                     firstMatch.cookieStoreId
             } else {
                 this.createContextualIdentity({name})
@@ -112,7 +110,7 @@ export class IslandManager {
             name,
         })
 
-        this._islandNameToCookieStoreIdMappings[name] =
+        this._islandNameToCookieStoreIdRoutes[name] =
             contextualIdentity.cookieStoreId
     }
 
@@ -127,7 +125,7 @@ export class IslandManager {
             Object.values(mappingChanges.newValue),
         )
 
-        // difference between old mappings and new mappings
+        // difference between old routes and new routes
         // ref - https://exploringjs.com/impatient-js/ch_sets.html#difference-a-b
         const removedIslandNames = new Set<string>(
             [...uniqueOldIslandNames].filter(
@@ -137,7 +135,7 @@ export class IslandManager {
 
         removedIslandNames.forEach((name) =>
             browser.contextualIdentities.remove(
-                this._islandNameToCookieStoreIdMappings[name],
+                this._islandNameToCookieStoreIdRoutes[name],
             ),
         )
     }

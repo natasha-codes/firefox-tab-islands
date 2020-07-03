@@ -1,10 +1,8 @@
 /**
- * Handle mappings JSON upload, storing the mappings in local storage
+ * Handle routes JSON upload, storing the routes in local storage
  *
  * ref - https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Working_with_files#Open_files_in_an_extension_using_a_file_picker
  */
-
-import {Constants} from "../Constants"
 
 // NOTE: this cannot be defined as a lambda function as we will then not have
 // access to the correct proprty on this
@@ -18,16 +16,18 @@ function handleFiles() {
         // `string` here because we call `readAsText` below (don't love the api)
         const parsed = JSON.parse(loaded.target.result as string)
 
+        // TODO: valiadate JSON
+
         browser.storage.local.set({
-            [Constants.mappingsStorageKey]: parsed,
+            parsed,
         })
 
-        document.getElementById("status").innerHTML = "Mappings saved!"
+        document.getElementById("status").innerHTML = "Routes saved!"
     }
 
     reader.readAsText(file)
 }
 
 document
-    .getElementById("mappingsJSON")
+    .getElementById("routesJSON")
     .addEventListener("change", handleFiles, false)

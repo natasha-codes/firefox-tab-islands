@@ -1,5 +1,6 @@
 export class Constants {
     static defaultCookieStoreId: string = "firefox-default"
-    static mappingsStorageKey: string = "mappings"
+    static islandsStorageKey: string = "islands"
+    static routesStorageKey: string = "routes"
     static storageArea: string = "local"
 }

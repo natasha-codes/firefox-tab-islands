@@ -1,8 +1,8 @@
 {
     "manifest_version": 2,
-    "name": "Firefox Islands",
-    "version": "0.1",
-    "description": "A config-based wrapper around Firefox's contextualidentities API",
+    "name": "Tab Islands",
+    "version": "0.1.1",
+    "description": "A config-file-based wrapper around Firefox's contextualIdentities API.",
     "icons": {
         "48": "icons/island_48x48.png",
         "96": "icons/island_96x96.png"

@@ -8,9 +8,22 @@
         "96": "icons/island_96x96.png"
     },
     "homepage_url": "https://github.com/natasha-codes/firefox-islands",
-    "permissions": ["contextualIdentities", "cookies", "tabs", "storage"],
+    "applications": {
+        "gecko": {
+            "id": "@firefox-islands"
+        }
+    },
+    "permissions": [
+        "contextualIdentities",
+        "cookies",
+        "tabs",
+        "storage",
+        "<all_urls>",
+        "webRequest",
+        "webRequestBlocking"
+    ],
     "background": {
-        "scripts": ["./build/background.js"]
+        "page": "build/background.html"
     },
     "content_scripts": [
         {

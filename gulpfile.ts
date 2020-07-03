@@ -46,16 +46,22 @@ const copySrcFileTask = (
 }
 
 gulp.task("compile:background", () => compileSrcDirTask("background"))
-gulp.task("build:background", gulp.task("compile:background"))
-
-gulp.task("compile:content", () => compileSrcDirTask("content"))
-gulp.task("build:content", gulp.task("compile:content"))
+gulp.task("copy:backgroundHtml", () =>
+    copySrcFileTask("background/background.html"),
+)
+gulp.task(
+    "build:background",
+    gulp.parallel("compile:background", "copy:backgroundHtml"),
+)
 
 gulp.task("compile:options", () => compileSrcDirTask("options"))
 gulp.task("copy:optionsHtml", () => copySrcFileTask("options/options.html"))
 gulp.task("build:options", gulp.parallel("compile:options", "copy:optionsHtml"))
 
+gulp.task("compile:content", () => compileSrcDirTask("content"))
+gulp.task("build:content", gulp.task("compile:content"))
+
 gulp.task(
     "build",
-    gulp.parallel("build:background", "build:content", "build:options"),
+    gulp.parallel("build:background", "build:options", "build:content"),
 )

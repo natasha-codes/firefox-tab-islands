@@ -12,8 +12,8 @@
     "scripts": {
         "build": "gulp build",
         "build:background": "gulp build:background",
-        "build:content": "gulp build:content",
-        "build:options": "gulp build:options"
+        "build:options": "gulp build:options",
+        "build:content": "gulp build:content"
     },
     "devDependencies": {
         "@types/browserify": "^12.0.36",

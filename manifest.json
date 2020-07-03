@@ -25,12 +25,6 @@
     "background": {
         "page": "build/background.html"
     },
-    "content_scripts": [
-        {
-            "matches": ["<all_urls>"],
-            "js": ["./build/content.js"]
-        }
-    ],
     "options_ui": {
         "page": "./build/options.html"
     }

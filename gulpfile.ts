@@ -58,10 +58,4 @@ gulp.task("compile:options", () => compileSrcDirTask("options"))
 gulp.task("copy:optionsHtml", () => copySrcFileTask("options/options.html"))
 gulp.task("build:options", gulp.parallel("compile:options", "copy:optionsHtml"))
 
-gulp.task("compile:content", () => compileSrcDirTask("content"))
-gulp.task("build:content", gulp.task("compile:content"))
-
-gulp.task(
-    "build",
-    gulp.parallel("build:background", "build:options", "build:content"),
-)
+gulp.task("build", gulp.parallel("build:background", "build:options"))

@@ -4,6 +4,8 @@
  * ref - https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Working_with_files#Open_files_in_an_extension_using_a_file_picker
  */
 
+import {Constants} from "../Constants"
+
 // NOTE: this cannot be defined as a lambda function as we will then not have
 // access to the correct proprty on this
 function handleFiles() {
@@ -17,7 +19,7 @@ function handleFiles() {
         const parsed = JSON.parse(loaded.target.result as string)
 
         browser.storage.local.set({
-            mappings: parsed,
+            [Constants.mappingsStorageKey]: parsed,
         })
 
         document.getElementById("status").innerHTML = "Mappings saved!"

@@ -15,7 +15,7 @@ export class StorageManager {
 
         const mappings = storedMappings[Constants.mappingsStorageKey]
 
-        this._mappings = mappings === undefined ? {} : JSON.parse(mappings)
+        this._mappings = mappings ?? {}
     }
 
     public mappings(): {[key: string]: string} {

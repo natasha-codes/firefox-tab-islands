@@ -3,7 +3,7 @@ import {IslandRouter} from "./IslandRouter"
 
 const main = async () => {
     await StorageManager.shared.attach()
-    console.log(StorageManager.shared.mappings())
+    console.log("mappings: ", StorageManager.shared.mappings())
 
     IslandRouter.shared.attach()
 }

@@ -3,15 +3,21 @@ export class StorageManager {
 
     private static mappingsKey: string = "mappings"
 
+    private _mappings: {[key: string]: string}
     private constructor() {}
 
-    public async getMappings(): Promise<{[key: string]: string}> {
+    public async attach(): Promise<void> {
         return browser.storage.local
             .get(StorageManager.mappingsKey)
             .then((res) => {
                 const mappings = res[StorageManager.mappingsKey]
 
-                return mappings === undefined ? {} : JSON.parse(mappings)
+                this._mappings =
+                    mappings === undefined ? {} : JSON.parse(mappings)
             })
+    }
+
+    public mappings(): {[key: string]: string} {
+        return this._mappings
     }
 }

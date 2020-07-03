@@ -23,7 +23,7 @@ const compileSrcDirTask = (
         basedir: `${srcDir}/${dirName}`,
         debug: true,
     })
-        .plugin(tsify, {noImplicitAny: true})
+        .plugin(tsify, {noImplicitAny: true, downlevelIteration: true})
         .bundle()
         .pipe(source(`${dirName}.js`))
         .pipe(gulp.dest(outDir))

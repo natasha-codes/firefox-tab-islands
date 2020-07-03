@@ -12,84 +12,81 @@ import {CookieStoreId, IslandManager} from "./IslandManager"
  * request.
  */
 export class IslandRouter {
-    public static shared: IslandRouter = new IslandRouter()
+  public static shared: IslandRouter = new IslandRouter()
 
-    private constructor() {}
+  private constructor() {}
 
-    public attach() {
-        const requestFilters: browser.webRequest.RequestFilter = {
-            urls: ["<all_urls>"],
-            types: ["main_frame"],
-        }
-
-        const requestExtraInfoSpec: browser.webRequest.OnBeforeRequestOptions[] = [
-            "blocking",
-        ]
-
-        browser.webRequest.onBeforeRequest.addListener(
-            (details) => this.handleRequest(details),
-            requestFilters,
-            requestExtraInfoSpec,
-        )
+  public attach() {
+    const requestFilters: browser.webRequest.RequestFilter = {
+      urls: ["<all_urls>"],
+      types: ["main_frame"],
     }
 
-    private async handleRequest(
-        details: RequestDetails,
-    ): Promise<browser.webRequest.BlockingResponse> {
-        const matchingCookieStoreId = await this.shouldRerouteRequest(details)
+    const requestExtraInfoSpec: browser.webRequest.OnBeforeRequestOptions[] = [
+      "blocking",
+    ]
 
-        if (matchingCookieStoreId) {
-            this.openTabForUrlInIsland(details.url, matchingCookieStoreId)
-            return ResponseOptions.Block
-        }
+    browser.webRequest.onBeforeRequest.addListener(
+      details => this.handleRequest(details),
+      requestFilters,
+      requestExtraInfoSpec,
+    )
+  }
 
-        return ResponseOptions.Allow
+  private async handleRequest(
+    details: RequestDetails,
+  ): Promise<browser.webRequest.BlockingResponse> {
+    const matchingCookieStoreId = await this.shouldRerouteRequest(details)
+
+    if (matchingCookieStoreId) {
+      this.openTabForUrlInIsland(details.url, matchingCookieStoreId)
+      return ResponseOptions.Block
     }
 
-    /**
-     * Determines if we should reroute a request to a different island.
-     *
-     * @param requestDetails - request details
-     * @returns null if no rerouting, or the cookie store ID to reroute to
-     */
-    private async shouldRerouteRequest(
-        details: RequestDetails,
-    ): Promise<null | CookieStoreId> {
-        const mappedRequestCookieStore =
-            IslandManager.shared.getMappedCookieStoreForUrl(details.url) ??
-            Constants.defaultCookieStoreId
+    return ResponseOptions.Allow
+  }
 
-        if (!details.cookieStoreId) {
-            const message = `Missing cookie store ID for request with URL: ${details.url}`
-            console.error(message)
-        }
+  /**
+   * Determines if we should reroute a request to a different island.
+   *
+   * @param requestDetails - request details
+   * @returns null if no rerouting, or the cookie store ID to reroute to
+   */
+  private async shouldRerouteRequest(
+    details: RequestDetails,
+  ): Promise<null | CookieStoreId> {
+    const mappedRequestCookieStore =
+      IslandManager.shared.getMappedCookieStoreForUrl(details.url) ??
+      Constants.defaultCookieStoreId
 
-        const currentRequestCookieStore =
-            details.cookieStoreId ?? Constants.defaultCookieStoreId
-
-        return mappedRequestCookieStore === currentRequestCookieStore
-            ? null
-            : mappedRequestCookieStore
+    if (!details.cookieStoreId) {
+      const message = `Missing cookie store ID for request with URL: ${details.url}`
+      console.error(message)
     }
 
-    private openTabForUrlInIsland(
-        url: string,
-        islandCookieStore: CookieStoreId,
-    ) {
-        browser.tabs.create({
-            url: url,
-            cookieStoreId: islandCookieStore,
-        })
-    }
+    const currentRequestCookieStore =
+      details.cookieStoreId ?? Constants.defaultCookieStoreId
+
+    return mappedRequestCookieStore === currentRequestCookieStore
+      ? null
+      : mappedRequestCookieStore
+  }
+
+  private openTabForUrlInIsland(url: string, islandCookieStore: CookieStoreId) {
+    browser.tabs.create({
+      url: url,
+      cookieStoreId: islandCookieStore,
+    })
+  }
 }
 
 interface RequestDetails {
-    url: string
-    cookieStoreId?: string
-    tabId: number
+  url: string
+  cookieStoreId?: string
+  tabId: number
 }
 
 namespace ResponseOptions {
-    export const Allow: browser.webRequest.BlockingResponse = {}
-    export const Block: browser.webRequest.BlockingResponse = {cancel: true}
+  export const Allow: browser.webRequest.BlockingResponse = {}
+  export const Block: browser.webRequest.BlockingResponse = {cancel: true}
 }

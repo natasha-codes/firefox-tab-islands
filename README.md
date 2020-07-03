@@ -4,10 +4,10 @@ Assign URLs to open in "tab islands" to isolate the cookies, logins, and trackin
 
 `Tab Islands` is designed to be:
 
--   Strict by default: only URLs assigned to an island will open in that island.
--   Lightweight: small featureset relying on Firefox's native
-    [contextual identities](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Work_with_contextual_identities).
--   Portable: use the same config across anywhere you use Firefox.
+- Strict by default: only URLs assigned to an island will open in that island.
+- Lightweight: small featureset relying on Firefox's native
+  [contextual identities](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Work_with_contextual_identities).
+- Portable: use the same config across anywhere you use Firefox.
 
 ## How Islands work
 
@@ -24,10 +24,10 @@ CIs are useful to anyone who might use the web with multiple "identities":
 > Users can log into multiple accounts on the same site, even when the site
 > does not natively support concurrent sessions.
 >
-> -   A user may wants (sic) to manage their work and personal Gmail accounts
->     side-by-side in the same window.
-> -   A user has a Facebook or eBay account for their business and one for their
->     personal life.
+> - A user may wants (sic) to manage their work and personal Gmail accounts
+>   side-by-side in the same window.
+> - A user has a Facebook or eBay account for their business and one for their
+>   personal life.
 >
 > https://wiki.mozilla.org/Security/Contextual_Identity_Project/Containers#Benefits_and_Use_Cases
 
@@ -36,11 +36,11 @@ They also provide significant privacy protections against tracking sites:
 > Provides protection against tracking while still providing access to
 > services
 >
-> -   A user wants to log into Facebook and keep the
->     site open while they browse the web, but doesn't want Facebook buttons to
->     track them across sites.
-> -   A user wants to use Gmail but doesn't want their google searches linked
->     to their Google account.
+> - A user wants to log into Facebook and keep the
+>   site open while they browse the web, but doesn't want Facebook buttons to
+>   track them across sites.
+> - A user wants to use Gmail but doesn't want their google searches linked
+>   to their Google account.
 >
 > https://wiki.mozilla.org/Security/Contextual_Identity_Project/Containers#Benefits_and_Use_Cases
 

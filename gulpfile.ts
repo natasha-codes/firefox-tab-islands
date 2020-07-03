@@ -15,18 +15,18 @@ import * as source from "vinyl-source-stream"
  * @param outDir - output dir
  */
 const compileSrcDirTask = (
-    dirName: string,
-    srcDir: string = "src",
-    outDir: string = "build",
+  dirName: string,
+  srcDir: string = "src",
+  outDir: string = "build",
 ): NodeJS.ReadWriteStream => {
-    return browserify([`${dirName}.ts`], {
-        basedir: `${srcDir}/${dirName}`,
-        debug: true,
-    })
-        .plugin(tsify, {noImplicitAny: true, downlevelIteration: true})
-        .bundle()
-        .pipe(source(`${dirName}.js`))
-        .pipe(gulp.dest(outDir))
+  return browserify([`${dirName}.ts`], {
+    basedir: `${srcDir}/${dirName}`,
+    debug: true,
+  })
+    .plugin(tsify, {noImplicitAny: true, downlevelIteration: true})
+    .bundle()
+    .pipe(source(`${dirName}.js`))
+    .pipe(gulp.dest(outDir))
 }
 
 /**
@@ -38,20 +38,20 @@ const compileSrcDirTask = (
  * @param outDir - output dir
  */
 const copySrcFileTask = (
-    fileName: string,
-    srcDir: string = "src",
-    outDir: string = "build",
+  fileName: string,
+  srcDir: string = "src",
+  outDir: string = "build",
 ): NodeJS.ReadWriteStream => {
-    return gulp.src(`${srcDir}/${fileName}`).pipe(gulp.dest(outDir))
+  return gulp.src(`${srcDir}/${fileName}`).pipe(gulp.dest(outDir))
 }
 
 gulp.task("compile:background", () => compileSrcDirTask("background"))
 gulp.task("copy:backgroundHtml", () =>
-    copySrcFileTask("background/background.html"),
+  copySrcFileTask("background/background.html"),
 )
 gulp.task(
-    "build:background",
-    gulp.parallel("compile:background", "copy:backgroundHtml"),
+  "build:background",
+  gulp.parallel("compile:background", "copy:backgroundHtml"),
 )
 
 gulp.task("compile:options", () => compileSrcDirTask("options"))

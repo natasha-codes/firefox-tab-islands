@@ -7,27 +7,27 @@
 // NOTE: this cannot be defined as a lambda function as we will then not have
 // access to the correct proprty on this
 function handleFiles() {
-    // returns an array of files even when only one uploaded
-    const file = this.files[0]
+  // returns an array of files even when only one uploaded
+  const file = this.files[0]
 
-    const reader = new FileReader()
+  const reader = new FileReader()
 
-    reader.onload = (loaded) => {
-        // `string` here because we call `readAsText` below (don't love the api)
-        const parsed = JSON.parse(loaded.target.result as string)
+  reader.onload = loaded => {
+    // `string` here because we call `readAsText` below (don't love the api)
+    const parsed = JSON.parse(loaded.target.result as string)
 
-        // TODO: valiadate JSON
+    // TODO: valiadate JSON
 
-        browser.storage.local.set({
-            parsed,
-        })
+    browser.storage.local.set({
+      parsed,
+    })
 
-        document.getElementById("status").innerHTML = "Routes saved!"
-    }
+    document.getElementById("status").innerHTML = "Routes saved!"
+  }
 
-    reader.readAsText(file)
+  reader.readAsText(file)
 }
 
 document
-    .getElementById("routesJSON")
-    .addEventListener("change", handleFiles, false)
+  .getElementById("routesJSON")
+  .addEventListener("change", handleFiles, false)

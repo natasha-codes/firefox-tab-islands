@@ -56,9 +56,8 @@ export class IslandRouter {
         details: RequestDetails,
     ): Promise<null | CookieStoreId> {
         const mappedRequestCookieStore =
-            (await IslandManager.shared.getMappedCookieStoreForUrl(
-                details.url,
-            )) ?? Constants.defaultCookieStoreId
+            IslandManager.shared.getMappedCookieStoreForUrl(details.url) ??
+            Constants.defaultCookieStoreId
 
         if (!details.cookieStoreId) {
             const message = `Missing cookie store ID for request with URL: ${details.url}`

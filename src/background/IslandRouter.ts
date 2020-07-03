@@ -27,7 +27,7 @@ export class IslandRouter {
         ]
 
         browser.webRequest.onBeforeRequest.addListener(
-            this.handleRequest,
+            (details) => this.handleRequest(details),
             requestFilters,
             requestExtraInfoSpec,
         )

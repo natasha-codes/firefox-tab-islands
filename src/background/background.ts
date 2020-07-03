@@ -1,9 +1,9 @@
-import {StorageManager} from "./StorageManager"
+import {IslandManager} from "./IslandManager"
 import {IslandRouter} from "./IslandRouter"
 
 const main = async () => {
-    await StorageManager.shared.attach()
-    console.log("mappings: ", StorageManager.shared.mappings())
+    await IslandManager.shared.attach()
+    console.log("mappings: ", IslandManager.shared.mappings())
 
     IslandRouter.shared.attach()
 }

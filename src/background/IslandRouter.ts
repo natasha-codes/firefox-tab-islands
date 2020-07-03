@@ -1,15 +1,15 @@
 import {Constants} from "../Constants"
-import {CookieStoreId, StorageManager} from "./StorageManager"
+import {CookieStoreId, IslandManager} from "./IslandManager"
 
 /**
  * `IslandRouter` listens for "main frame" web requests (requests
  * being made as the top-level request for a tab), and routes them
  * to the appropriate island (contextual identity).
  *
- * If the request being made's tab is a part the island the request
- * belongs to, it goes through uninterrputed. Otherwise, we block it
- * and spawn a new tab in the request's island in which to replay
- * the request.
+ * If the request is being made from its associated island (tab already has the
+ * correct contextual identity) it goes through uninterrputed. Otherwise, we
+ * block it and spawn a new tab in the request's island in which to replay the
+ * request.
  */
 export class IslandRouter {
     public static shared: IslandRouter = new IslandRouter()
@@ -36,10 +36,10 @@ export class IslandRouter {
     private async handleRequest(
         details: RequestDetails,
     ): Promise<browser.webRequest.BlockingResponse> {
-        const rerouteToCookieStore = await this.shouldRerouteRequest(details)
+        const matchingCookieStoreId = await this.shouldRerouteRequest(details)
 
-        if (rerouteToCookieStore) {
-            this.openTabForUrlInIsland(details.url, rerouteToCookieStore)
+        if (matchingCookieStoreId) {
+            this.openTabForUrlInIsland(details.url, matchingCookieStoreId)
             return ResponseOptions.Block
         }
 
@@ -56,7 +56,7 @@ export class IslandRouter {
         details: RequestDetails,
     ): Promise<null | CookieStoreId> {
         const mappedRequestCookieStore =
-            (await StorageManager.shared.getMappedCookieStoreForUrl(
+            (await IslandManager.shared.getMappedCookieStoreForUrl(
                 details.url,
             )) ?? Constants.defaultCookieStoreId
 

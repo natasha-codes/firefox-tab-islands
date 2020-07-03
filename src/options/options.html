@@ -3,11 +3,17 @@
     <meta charset="utf-8">
   </head>
   <body>
-    Upload your mappings JSON (see an example @ <TODO: add link to example here>)
+    <p>Upload your mappings JSON</p>
+
+    <p>see an example <a href="https://github.com/natasha-codes/firefox-islands/blob/4bd7df6c2cc9082481dc143948c4203bea52d65e/example_mappings.json">here</a></p>
+
     <form>
       <!-- TODO: understand how accept="*.json" is supposed to work -->
       <input id="mappingsJSON" type="file" name="mappings" accept="*.json" >
     </form>
+
+      <p id="status"></p>
+
     <script src="options.js"></script>
   </body>
 </html>

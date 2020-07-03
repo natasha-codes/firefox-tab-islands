@@ -19,6 +19,8 @@ function handleFiles() {
         browser.storage.local.set({
             mappings: parsed,
         })
+
+        document.getElementById("status").innerHTML = "Mappings saved!"
     }
 
     reader.readAsText(file)

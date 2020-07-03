@@ -1,19 +1,19 @@
+import {Constants} from "../Constants"
+
 export type CookieStoreId = string
 
 export class StorageManager {
     public static shared: StorageManager = new StorageManager()
-
-    private static mappingsKey: string = "mappings"
 
     private _mappings: {[key: string]: string}
     private constructor() {}
 
     public async attach(): Promise<void> {
         const storedMappings = await browser.storage.local.get(
-            StorageManager.mappingsKey,
+            Constants.mappingsStorageKey,
         )
 
-        const mappings = storedMappings[StorageManager.mappingsKey]
+        const mappings = storedMappings[Constants.mappingsStorageKey]
 
         this._mappings = mappings === undefined ? {} : JSON.parse(mappings)
     }

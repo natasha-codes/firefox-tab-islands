@@ -75,8 +75,8 @@ And this all happens automatically!
 
 ## Installing
 
-`Tab Islands` is (or will soon be) available on the
-[Firefox Addons store](https://addons.mozilla.org)!
+`Tab Islands` is available on the
+[Firefox Addons store](https://addons.mozilla.org/firefox/addon/tab-islands)!
 
 ### Setting up your contextual identities
 

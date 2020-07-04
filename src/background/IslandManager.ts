@@ -1,7 +1,5 @@
 import {Constants} from "../Constants"
 
-export type CookieStoreId = string
-
 export class IslandManager {
   public static shared: IslandManager = new IslandManager()
 
@@ -135,6 +133,8 @@ export class IslandManager {
     )
   }
 }
+
+export type CookieStoreId = string
 
 type StringToStringMap = {[key: string]: string}
 

@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Tab Islands",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A Firefox extension to automatically isolate logins and web trackers.",
   "icons": {
     "48": "icons/island_48x48.png",

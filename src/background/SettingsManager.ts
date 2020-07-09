@@ -27,8 +27,6 @@ export class SettingsManager {
       return
     }
 
-    console.log("changes:", changes)
-
     const islandsChanges = changes?.islands?.newValue
     if (islandsChanges) {
       await this.updateIslands()
@@ -69,13 +67,9 @@ export class SettingsManager {
   }
 
   private async updateRoutes() {
-    console.log("about to updateRoutes")
-
     const storedRoutes = await browser.storage.local.get(
       Constants.routesStorageKey,
     )
-
-    console.log("storedRoutes: ", storedRoutes)
 
     const routes = storedRoutes[Constants.routesStorageKey]
 
@@ -83,13 +77,9 @@ export class SettingsManager {
   }
 
   private async updateIslands() {
-    console.log("about to updateRoutes")
-
     const storedIslands = await browser.storage.local.get(
       Constants.islandsStorageKey,
     )
-
-    console.log("storedIslands: ", storedIslands)
 
     const islands = storedIslands[Constants.islandsStorageKey]
 

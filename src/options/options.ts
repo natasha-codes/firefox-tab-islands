@@ -17,8 +17,6 @@ function handleFiles() {
     const parsed = JSON.parse(loaded.target.result as string)
 
     // TODO: valiadate JSON
-
-    console.log("parsed: ", parsed)
     browser.storage.local.set({
       ...parsed,
     })

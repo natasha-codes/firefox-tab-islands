@@ -1,8 +1,8 @@
-import {IslandManager} from "./IslandManager"
+import {SettingsManager} from "./SettingsManager"
 import {IslandRouter} from "./IslandRouter"
 
 const main = async () => {
-  await IslandManager.shared.attach()
+  await SettingsManager.shared.attach()
 
   IslandRouter.shared.attach()
 }

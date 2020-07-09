@@ -1,5 +1,5 @@
 import {Constants} from "../Constants"
-import {CookieStoreId, IslandManager} from "./IslandManager"
+import {CookieStoreId, SettingsManager} from "./SettingsManager"
 
 /**
  * `IslandRouter` listens for "main frame" web requests (requests
@@ -56,7 +56,7 @@ export class IslandRouter {
     details: RequestDetails,
   ): Promise<null | CookieStoreId> {
     const mappedRequestCookieStore =
-      IslandManager.shared.getMappedCookieStoreForUrl(details.url) ??
+      SettingsManager.shared.getMappedCookieStoreForUrl(details.url) ??
       Constants.defaultCookieStoreId
 
     if (!details.cookieStoreId) {

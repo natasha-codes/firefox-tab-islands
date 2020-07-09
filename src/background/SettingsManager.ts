@@ -1,7 +1,7 @@
 import {Constants} from "../Constants"
 
-export class IslandManager {
-  public static shared: IslandManager = new IslandManager()
+export class SettingsManager {
+  public static shared: SettingsManager = new SettingsManager()
 
   private _islands: {
     [key: string]: Omit<ContextualIdentityDetails, "name">

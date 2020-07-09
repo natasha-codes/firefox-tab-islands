@@ -1,0 +1,21 @@
+{
+  "islands": {
+    "amazon": {
+      "icon": "pet",
+      "color": "pink"
+    },
+    "google": {
+      "icon": "fingerprint",
+      "color": "yellow"
+    },
+    "big-blue": {
+      "color": "blue",
+      "icon": "chill"
+    }
+  },
+  "routes": {
+    "google": "google",
+    "facebook": "big-blue",
+    "amazon": "amazon"
+  }
+}

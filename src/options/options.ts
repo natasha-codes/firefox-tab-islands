@@ -1,5 +1,5 @@
 /**
- * Handle routes JSON upload, storing the routes in local storage
+ * Handle settings JSON upload, storing the settings in local storage
  *
  * ref - https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Working_with_files#Open_files_in_an_extension_using_a_file_picker
  */
@@ -18,16 +18,17 @@ function handleFiles() {
 
     // TODO: valiadate JSON
 
+    console.log("parsed: ", parsed)
     browser.storage.local.set({
-      parsed,
+      ...parsed,
     })
 
-    document.getElementById("status").innerHTML = "Routes saved!"
+    document.getElementById("status").innerHTML = "Settings saved!"
   }
 
   reader.readAsText(file)
 }
 
 document
-  .getElementById("routesJSON")
+  .getElementById("settingsJSON")
   .addEventListener("change", handleFiles, false)

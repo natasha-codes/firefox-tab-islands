@@ -39,7 +39,7 @@ export class IslandRouter {
     const matchingCookieStoreId = await this.shouldRerouteRequest(details)
 
     if (matchingCookieStoreId) {
-      this.openTabForUrlInIsland(details.url, matchingCookieStoreId)
+      this.replayRequestInIsland(details, matchingCookieStoreId)
       return ResponseOptions.Block
     }
 
@@ -72,18 +72,57 @@ export class IslandRouter {
       : mappedRequestCookieStore
   }
 
-  private openTabForUrlInIsland(url: string, islandCookieStore: CookieStoreId) {
-    browser.tabs.create({
-      url: url,
+  private async replayRequestInIsland(
+    details: RequestDetails,
+    islandCookieStore: CookieStoreId,
+  ): Promise<browser.tabs.Tab> {
+    const tabCreationDetails: TabCreationDetails = {
+      url: details.url,
       cookieStoreId: islandCookieStore,
-    })
+    }
+
+    if (details.tabId !== -1) {
+      tabCreationDetails.index =
+        (await browser.tabs.get(details.tabId)).index + 1
+
+      // Don't await, if this fails that's okay
+      this.tabWithIdIsDiscardable(details.tabId).then(
+        isDiscardable => isDiscardable && this.closeTabWithId(details.tabId),
+      )
+    }
+
+    return browser.tabs.create(tabCreationDetails)
+  }
+
+  private async tabWithIdIsDiscardable(tabId: number): Promise<boolean> {
+    return browser.tabs.get(tabId).then(
+      ({url}) =>
+        Constants.defaultDiscardableTabs.has(url) ||
+        // TODO: query settings for discardables
+        /moz-extension.*public\/index.html/.test(url),
+    )
+  }
+
+  private async closeTabWithId(tabId: number): Promise<void> {
+    return browser.tabs.remove(tabId)
   }
 }
 
 interface RequestDetails {
   url: string
+
+  // Cookie store ID of the tab making the request, if present.
   cookieStoreId?: string
+
+  // Index of the tab the request is being made in. -1 if not
+  // associated with a tab (which should never happen for us).
   tabId: number
+}
+
+interface TabCreationDetails {
+  url: string
+  index?: number
+  cookieStoreId: CookieStoreId
 }
 
 namespace ResponseOptions {

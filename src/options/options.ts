@@ -12,7 +12,7 @@ function handleFiles() {
 
   const reader = new FileReader()
 
-  reader.onload = loaded => {
+  reader.onload = (loaded) => {
     // `string` here because we call `readAsText` below (don't love the api)
     const parsed = JSON.parse(loaded.target.result as string)
 

@@ -1,6 +1,5 @@
 import * as gulp from "gulp"
 import * as browserify from "browserify"
-import * as tsify from "tsify"
 import * as source from "vinyl-source-stream"
 
 /**
@@ -23,7 +22,7 @@ const compileSrcDirTask = (
     basedir: `${srcDir}/${dirName}`,
     debug: true,
   })
-    .plugin(tsify, {noImplicitAny: true, downlevelIteration: true})
+    .plugin("tsify", { project: "./tsconfig.json" })
     .bundle()
     .pipe(source(`${dirName}.js`))
     .pipe(gulp.dest(outDir))

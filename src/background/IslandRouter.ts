@@ -1,5 +1,5 @@
-import {Constants} from "../Constants"
-import {CookieStoreId, SettingsManager} from "./SettingsManager"
+import { Constants } from "../Constants"
+import { CookieStoreId, SettingsManager } from "./SettingsManager"
 
 /**
  * `IslandRouter` listens for "main frame" web requests (requests
@@ -14,7 +14,7 @@ import {CookieStoreId, SettingsManager} from "./SettingsManager"
 export class IslandRouter {
   public static shared: IslandRouter = new IslandRouter()
 
-  private constructor() {}
+  private constructor() { }
 
   public attach() {
     const requestFilters: browser.webRequest.RequestFilter = {
@@ -27,7 +27,7 @@ export class IslandRouter {
     ]
 
     browser.webRequest.onBeforeRequest.addListener(
-      details => this.handleRequest(details),
+      (details) => this.handleRequest(details),
       requestFilters,
       requestExtraInfoSpec,
     )
@@ -125,7 +125,7 @@ interface TabCreationDetails {
   cookieStoreId: CookieStoreId
 }
 
-namespace ResponseOptions {
-  export const Allow: browser.webRequest.BlockingResponse = {}
-  export const Block: browser.webRequest.BlockingResponse = {cancel: true}
+export class ResponseOptions {
+  static Allow: browser.webRequest.BlockingResponse = {}
+  static Block: browser.webRequest.BlockingResponse = { cancel: true }
 }

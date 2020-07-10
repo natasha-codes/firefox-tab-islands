@@ -1,170 +1,198 @@
-import {Constants} from "../Constants"
+import { Constants } from "../Constants"
+import { Util } from "./Util"
 
 export class SettingsManager {
   public static shared: SettingsManager = new SettingsManager()
 
-  private _islands: {
-    [key: string]: Omit<ContextualIdentityDetails, "name">
-  } = {}
-
-  private _routes: StringToStringMap = {}
-
-  private _islandNameToCookieStoreIdRoutes: StringToStringMap = {}
+  private _settings: Settings = {
+    islands: {},
+    routes: {},
+  }
 
   private constructor() {}
 
   public async attach(): Promise<void> {
-    this.applySettings()
+    this.loadSettingsFromStorage()
 
-    browser.storage.onChanged.addListener(this.onSettingsChange)
-  }
-
-  private onSettingsChange = async (
-    changes: {[key: string]: browser.storage.StorageChange},
-    areaName: string,
-  ) => {
-    if (areaName !== Constants.storageArea) {
-      return
-    }
-
-    const islandsChanges = changes?.islands?.newValue
-    if (islandsChanges) {
-      await this.updateIslands()
-    }
-
-    const routesChanges = changes?.routes?.newValue
-    if (routesChanges) {
-      await this.updateRoutes()
-    }
+    browser.storage.onChanged.addListener((_, areaName) =>
+      this.onSettingsChange(areaName),
+    )
   }
 
   public getMappedCookieStoreForUrl(url: string): null | CookieStoreId {
-    const routes = this._routes
-
-    const firstMatchingMappingKey = Object.keys(routes).find(urlFragment =>
-      url.includes(urlFragment),
-    )
+    const firstMatchingMappingKey = Object.keys(
+      this._settings.routes,
+    ).find((urlFragment) => url.includes(urlFragment))
 
     if (!firstMatchingMappingKey) {
       return null
     }
 
-    const islandName = routes[firstMatchingMappingKey]
-
-    const cookieStoreId = this._islandNameToCookieStoreIdRoutes[islandName]
+    const islandForUrl = this._settings.routes[firstMatchingMappingKey]
+    const cookieStoreId = this._settings.islands[islandForUrl]?.cookieStoreId
 
     if (!cookieStoreId) {
-      console.error(`No cookie store id found for islandName: '${islandName}'`)
+      console.error(`No cookie store id found for island: '${islandForUrl}'`)
+      return null
     }
 
     return cookieStoreId
   }
 
-  private async applySettings() {
-    await this.updateRoutes()
+  private async onSettingsChange(areaName: string): Promise<void> {
+    if (areaName !== Constants.storageArea) {
+      return
+    }
 
-    await this.createContextualIdentitiesFromIslands()
-  }
+    const oldSettings: Settings = Util.deepCopyJson(this._settings)
 
-  private async updateRoutes() {
-    const storedRoutes = await browser.storage.local.get(
-      Constants.routesStorageKey,
+    console.log("onSettingsChange - old settings: ", oldSettings)
+
+    await this.loadSettingsFromStorage()
+
+    const newSettings: Settings = this._settings
+
+    console.log("onSettingsChange - new settings: ", newSettings)
+
+    // Remove CIs that are no longer associated with islands
+    const oldIslandNames = new Set<string>(Object.keys(oldSettings.islands))
+    const currentIslandNames = new Set<string>(Object.keys(newSettings.islands))
+
+    // set difference: https://exploringjs.com/impatient-js/ch_sets.html#difference-a-b
+    const orphanedIslandNames = new Set<string>(
+      [...oldIslandNames].filter((name) => !currentIslandNames.has(name)),
     )
 
-    const routes = storedRoutes[Constants.routesStorageKey]
-
-    this._routes = routes ?? {}
-  }
-
-  private async updateIslands() {
-    const storedIslands = await browser.storage.local.get(
-      Constants.islandsStorageKey,
+    console.log(
+      "onSettingsChange - removing orphaned islands: ",
+      orphanedIslandNames,
     )
 
-    const islands = storedIslands[Constants.islandsStorageKey]
-
-    this._routes = islands ?? {}
+    return Promise.all(
+      Array.from(orphanedIslandNames).map((name) => {
+        return browser.contextualIdentities.remove(
+          oldSettings.islands[name].cookieStoreId,
+        )
+      }),
+    ).then((_) => {})
   }
 
   /**
-   * create a map from island names (e.g. * "the_goog") from user
-   * routes to cookieStoreId (serves as a unique identifier for the
-   * contextual identity)
-   *
-   * this function ensures that there exists a contextual identity for every
-   * island name in the user's mapping file
-   *
-   * if there already exists an island with the associated name store that
-   * mapping, else create a new one
+   * Load all settings from storage.
    */
-  private async createContextualIdentitiesFromIslands() {
-    const storedIslands = await browser.storage.local.get(
-      Constants.islandsStorageKey,
-    )
+  private async loadSettingsFromStorage(): Promise<void> {
+    console.log("loadSettingsFromStorage")
 
-    const islands = storedIslands[Constants.islandsStorageKey]
-
-    this._islands = islands ?? {}
-
-    Object.entries(this._islands).forEach(async ([name, {color, icon}]) => {
-      const matchingContextualIdentities = await browser.contextualIdentities.query(
-        {name},
-      )
-
-      if (!!matchingContextualIdentities.length) {
-        const firstMatch = matchingContextualIdentities[0]
-
-        this._islandNameToCookieStoreIdRoutes[name] = firstMatch.cookieStoreId
-      } else {
-        this.createContextualIdentity({color, icon, name})
-      }
-    })
+    return Promise.all([
+      this.loadIslandSettingsFromStorage(),
+      this.loadRouteSettingsFromStorage(),
+    ]).then((_) => {})
   }
 
-  // ref - https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/contextualIdentities/create
-  private async createContextualIdentity({
-    name,
-    icon,
-    color,
-  }: ContextualIdentityDetails) {
-    const contextualIdentity = await browser.contextualIdentities.create({
-      color,
-      icon,
-      name,
-    })
+  /**
+   * Load route settings from storage.
+   */
+  private async loadRouteSettingsFromStorage(): Promise<void> {
+    const routes: { [key: string]: string } =
+      (await browser.storage.local.get(Constants.routesStorageKey)[
+        Constants.routesStorageKey
+      ]) ?? {}
 
-    this._islandNameToCookieStoreIdRoutes[name] =
-      contextualIdentity.cookieStoreId
+    this._settings.routes = routes
   }
 
-  // remove no longer mapped islands (contextual identities)
-  private async removeUnmappedContextualIdentities(
-    islandsChanges: browser.storage.StorageChange,
-  ) {
-    const uniqueOldIslandNames = new Set<string>(
-      Object.keys(islandsChanges.oldValue?.islands),
-    )
-    const uniqueNewIslandNames = new Set<string>(
-      Object.keys(islandsChanges.newValue?.islands),
-    )
+  /**
+   * Load island settings from storage.
+   */
+  private async loadIslandSettingsFromStorage(): Promise<void> {
+    const islandCIDetails: { [key: string]: ContextualIdentityDetails } =
+      (await browser.storage.local.get(Constants.islandsStorageKey))[
+        Constants.islandsStorageKey
+      ] ?? {}
 
-    // difference between old islands and new islands
-    // ref - https://exploringjs.com/impatient-js/ch_sets.html#difference-a-b
-    const removedIslandNames = new Set<string>(
-      [...uniqueOldIslandNames].filter(name => !uniqueNewIslandNames.has(name)),
-    )
-
-    removedIslandNames.forEach(name =>
-      browser.contextualIdentities.remove(
-        this._islandNameToCookieStoreIdRoutes[name],
+    const islandSettings: [string, IslandDetails][] = await Promise.all(
+      Object.entries(
+        islandCIDetails,
+      ).map((details: [string, ContextualIdentityDetails]) =>
+        this.islandCIDetailsToIsland(details),
       ),
     )
+
+    this._settings.islands = Object.fromEntries(islandSettings)
+  }
+
+  /**
+   * Fill out the island details for an island setting.
+   */
+  private async islandCIDetailsToIsland([islandName, ciDetails]: [
+    string,
+    ContextualIdentityDetails,
+  ]): Promise<[string, IslandDetails]> {
+    const island: IslandDetails = {
+      icon: ciDetails.icon,
+      color: ciDetails.color,
+      cookieStoreId: await this.getOrCreateCookieStoreForIsland(
+        islandName,
+        ciDetails,
+      ),
+    }
+
+    return [islandName, island]
+  }
+
+  /**
+   * Get the CookieStoreId of the ContextualIdentity for this island,
+   * or create a CI with the given details if none exists.
+   */
+  private async getOrCreateCookieStoreForIsland(
+    islandName: string,
+    ciDetails: ContextualIdentityDetails,
+  ): Promise<CookieStoreId> {
+    const existingCIsForIsland = await browser.contextualIdentities.query({
+      name: islandName,
+    })
+
+    if (existingCIsForIsland.length === 0) {
+      return this.createContextualIdentityForIsland(islandName, ciDetails)
+    } else if (existingCIsForIsland.length === 1) {
+      return existingCIsForIsland[0].cookieStoreId
+    } else {
+      console.error("Multiple CIs found for island name: ", islandName)
+      return existingCIsForIsland[0].cookieStoreId
+    }
+  }
+
+  /**
+   * Create a ContextualIdentity with the given details, for the given
+   * island. The CI will have the same name as the island.
+   */
+  private async createContextualIdentityForIsland(
+    islandName: string,
+    ciDetails: ContextualIdentityDetails,
+  ): Promise<CookieStoreId> {
+    return browser.contextualIdentities
+      .create({
+        name: islandName,
+        color: ciDetails.color,
+        icon: ciDetails.icon,
+      })
+      .then((contextualIdentity) => contextualIdentity.cookieStoreId)
   }
 }
 
 export type CookieStoreId = string
 
-type StringToStringMap = {[key: string]: string}
+export interface Settings {
+  islands: IslandSettings
+  routes: RouteSettings
+}
+
+type IslandSettings = { [key: string]: IslandDetails }
+type RouteSettings = { [key: string]: string }
+
+type IslandDetails = {
+  cookieStoreId: CookieStoreId
+} & ContextualIdentityDetails
 
 // ref - https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/contextualIdentities/create
 interface ContextualIdentityDetails {
@@ -192,5 +220,4 @@ interface ContextualIdentityDetails {
     | "tree"
     | "chill"
     | "fence"
-  name: string
 }

@@ -1,6 +1,7 @@
 import * as gulp from "gulp"
 import * as browserify from "browserify"
 import * as source from "vinyl-source-stream"
+import { src } from "gulp"
 
 /**
  * Return a gulp task function to browserify and transpile
@@ -13,11 +14,11 @@ import * as source from "vinyl-source-stream"
  * @param srcDir - source dir
  * @param outDir - output dir
  */
-const compileSrcDirTask = (
+function compileSrcDirTask(
   dirName: string,
   srcDir: string = "src",
   outDir: string = "build",
-): NodeJS.ReadWriteStream => {
+): NodeJS.ReadWriteStream {
   return browserify([`${dirName}.ts`], {
     basedir: `${srcDir}/${dirName}`,
     debug: true,
@@ -36,12 +37,23 @@ const compileSrcDirTask = (
  * @param srcDir - path to dir containing `fileName`
  * @param outDir - output dir
  */
-const copySrcFileTask = (
+function copySrcFileTask(
   fileName: string,
   srcDir: string = "src",
   outDir: string = "build",
-): NodeJS.ReadWriteStream => {
+): NodeJS.ReadWriteStream {
   return gulp.src(`${srcDir}/${fileName}`).pipe(gulp.dest(outDir))
+}
+
+function watchSrcDir(
+  dirName: string,
+  runTaskName: string,
+  srcDir: string = "src",
+) {
+  gulp.watch(
+    [`${srcDir}/${dirName}/**/*`, `${srcDir}/*.ts`],
+    gulp.series(runTaskName),
+  )
 }
 
 gulp.task("compile:background", () => compileSrcDirTask("background"))
@@ -52,9 +64,14 @@ gulp.task(
   "build:background",
   gulp.parallel("compile:background", "copy:backgroundHtml"),
 )
+gulp.task("watch:background", () =>
+  watchSrcDir("background", "build:background"),
+)
 
 gulp.task("compile:options", () => compileSrcDirTask("options"))
 gulp.task("copy:optionsHtml", () => copySrcFileTask("options/options.html"))
 gulp.task("build:options", gulp.parallel("compile:options", "copy:optionsHtml"))
+gulp.task("watch:options", () => watchSrcDir("options", "build:options"))
 
 gulp.task("build", gulp.parallel("build:background", "build:options"))
+gulp.task("watch", gulp.parallel("watch:background", "watch:options"))

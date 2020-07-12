@@ -1,25 +1,49 @@
 <html>
-    <head>
-        <meta charset="utf-8" />
-    </head>
-    <body>
-        <p>Upload your settings JSON</p>
+  <head>
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <!-- yolo -->
+    <h1>
+      Tab Islands settings
+    </h1>
 
-        <p>
-            see an example
-            <a
-                href="https://github.com/natasha-codes/firefox-tab-islands/blob/fcf91eead4222d1ddb83069fe644b3c7811b41f3/example_settings.json"
-                >here</a
-            >
-        </p>
+    <h2>Islands</h2>
+    <table id="islands">
+      <tr id="islands-header-row">
+        <th>Name</th>
+        <th>Icon</th>
+        <th>Color</th>
+        <th hidden>Action</th>
+      </tr>
+      <tr id="islands-template-row">
+        <td id="islands-template-row-name">
+          <input type="text" placeholder="Island name" />
+        </td>
+        <td id="islands-template-row-icon">
+          <select name="icon" id="islands-template-row-icon-picker">
+            <option value="fist">fist</option>
+          </select>
+        </td>
+        <td id="islands-template-row-color">
+          <select name="color" id="islands-template-row-color-picker">
+            <option value="bloo">bloo</option>
+          </select>
+        </td>
+        <td id="islands-template-row-submit">
+          <button id="islands-template-row-submit-button">Add</button>
+        </td>
+      </tr>
+    </table>
 
-        <form>
-            <!-- TODO: understand how accept="*.json" is supposed to work -->
-            <input id="settingsJSON" type="file" name="settings" accept="*.json" />
-        </form>
+    <h2>Routes</h2>
+    <table id="routes-table">
+      <tr>
+        <th>URL</th>
+        <th>Island</th>
+      </tr>
+    </table>
 
-        <p id="status"></p>
-
-        <script src="options.js"></script>
-    </body>
+    <script src="options.js"></script>
+  </body>
 </html>

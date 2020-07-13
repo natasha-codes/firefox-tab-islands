@@ -1,8 +1,8 @@
-import { SettingsManager } from "./SettingsManager"
+import { CookieStoreManager } from "./CookieStoreManager"
 import { IslandRouter } from "./IslandRouter"
 
 const main = async () => {
-  await SettingsManager.shared.attach()
+  await CookieStoreManager.shared.attach()
 
   IslandRouter.shared.attach()
 

@@ -7,8 +7,8 @@ import {
 } from "../StorageWrapper"
 import { Util } from "./Util"
 
-export class SettingsManager {
-  public static shared: SettingsManager = new SettingsManager()
+export class CookieStoreManager {
+  public static shared: CookieStoreManager = new CookieStoreManager()
 
   private _settings: Settings = {
     islands: {},
@@ -26,7 +26,7 @@ export class SettingsManager {
     )
   }
 
-  public getMappedCookieStoreForUrl(url: string): null | CookieStoreId {
+  public getCookieStoreForUrl(url: string): null | CookieStoreId {
     const firstMatchingMappingKey = Object.keys(
       this._settings.routes,
     ).find((urlFragment) => url.includes(urlFragment))

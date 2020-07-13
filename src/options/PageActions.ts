@@ -3,7 +3,7 @@ import {
   ContextualIdentityColor,
   ContextualIdentityIcon,
 } from "../ContextualIdentity"
-import { StoredSettings, StorageWrapper } from "../StorageWrapper"
+import { Settings, StorageWrapper } from "../StorageWrapper"
 import * as PageElements from "./PageElements"
 
 export async function renderTables(): Promise<void> {
@@ -11,7 +11,7 @@ export async function renderTables(): Promise<void> {
   // do rows stuff
   // based on storage
 
-  const settings: StoredSettings = await StorageWrapper.getStoredSettings()
+  const settings: Settings = await StorageWrapper.getStoredSettings()
 
   console.log(settings)
 

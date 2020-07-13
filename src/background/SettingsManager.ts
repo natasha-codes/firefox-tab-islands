@@ -13,6 +13,7 @@ export class SettingsManager {
   private _settings: Settings = {
     islands: {},
     routes: {},
+    cookieStores: {},
   }
 
   private constructor() {}
@@ -35,7 +36,7 @@ export class SettingsManager {
     }
 
     const islandForUrl = this._settings.routes[firstMatchingMappingKey]
-    const cookieStoreId = this._settings.islands[islandForUrl]?.cookieStoreId
+    const cookieStoreId = this._settings.cookieStores[islandForUrl]
 
     if (!cookieStoreId) {
       console.error(`No cookie store id found for island: '${islandForUrl}'`)
@@ -77,7 +78,7 @@ export class SettingsManager {
     return Promise.all(
       Array.from(orphanedIslandNames).map((name) => {
         return browser.contextualIdentities.remove(
-          oldSettings.islands[name].cookieStoreId,
+          oldSettings.cookieStores[name],
         )
       }),
     ).then((_) => {})

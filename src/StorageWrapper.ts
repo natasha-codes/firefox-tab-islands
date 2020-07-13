@@ -1,3 +1,4 @@
+import { ContextualIdentityDetails } from "./ContextualIdentity"
 import { Constants } from "./Constants"
 
 export class StorageWrapper {
@@ -22,10 +23,10 @@ export class StorageWrapper {
   }
 }
 
-export interface StoredSettings {
-  islands: StoredIslandSettings
-  routes: StoredRouteSettings
+export interface Settings {
+  islands: IslandSettings
+  routes: RouteSettings
 }
 
-export type StoredIslandSettings = { [key: string]: ContextualIdentityDetails }
-export type StoredRouteSettings = { [key: string]: string }
+export type IslandSettings = { [key: string]: ContextualIdentityDetails }
+export type RouteSettings = { [key: string]: string }

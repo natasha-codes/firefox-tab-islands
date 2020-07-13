@@ -1,8 +1,8 @@
 import { Constants } from "../Constants"
 import { ContextualIdentityDetails } from "../ContextualIdentity"
 import {
-  StoredIslandSettings,
-  StoredRouteSettings,
+  IslandSettings,
+  RouteSettings,
   StorageWrapper,
 } from "../StorageWrapper"
 import { Util } from "./Util"
@@ -91,52 +91,34 @@ export class SettingsManager {
 
     const storedSettings = await StorageWrapper.getStoredSettings()
 
-    this.updateRouteSettingsFromStorage(storedSettings.routes)
-  }
-
-  /**
-   * Update route settings from storage.
-   */
-  private async updateRouteSettingsFromStorage(
-    storedRoutes: StoredRouteSettings,
-  ): Promise<void> {
-    this._settings.routes = storedRoutes
+    this._settings.islands = storedSettings.islands
+    this._settings.routes = storedSettings.routes
+    this._settings.cookieStores = await this.getOrCreateCookieStoresForIslands(
+      storedSettings.islands,
+    )
   }
 
   /**
    * Update island settings from storage.
    */
-  private async updateIslandSettingsFromStorage(
-    storedIslands: StoredIslandSettings,
-  ): Promise<void> {
-    const islandSettings: [string, IslandDetails][] = await Promise.all(
-      Object.entries(
-        storedIslands,
-      ).map((details: [string, ContextualIdentityDetails]) =>
-        this.islandCIDetailsToIsland(details),
-      ),
+  private async getOrCreateCookieStoresForIslands(
+    storedIslands: IslandSettings,
+  ): Promise<{ [key: string]: CookieStoreId }> {
+    const storedIslandEntries: [
+      string,
+      ContextualIdentityDetails,
+    ][] = Object.entries(storedIslands)
+
+    const cookieStoreEntries: Promise<
+      [string, CookieStoreId]
+    >[] = storedIslandEntries.map(([name, ciDetails]) =>
+      this.getOrCreateCookieStoreForIsland(
+        name,
+        ciDetails,
+      ).then((cookieStoreId) => [name, cookieStoreId]),
     )
 
-    this._settings.islands = Object.fromEntries(islandSettings)
-  }
-
-  /**
-   * Fill out the island details for an island setting.
-   */
-  private async islandCIDetailsToIsland([islandName, ciDetails]: [
-    string,
-    ContextualIdentityDetails,
-  ]): Promise<[string, IslandDetails]> {
-    const island: IslandDetails = {
-      icon: ciDetails.icon,
-      color: ciDetails.color,
-      cookieStoreId: await this.getOrCreateCookieStoreForIsland(
-        islandName,
-        ciDetails,
-      ),
-    }
-
-    return [islandName, island]
+    return Object.fromEntries(await Promise.all(cookieStoreEntries))
   }
 
   /**
@@ -184,11 +166,5 @@ export type CookieStoreId = string
 interface Settings {
   islands: IslandSettings
   routes: RouteSettings
+  cookieStores: { [key: string]: CookieStoreId } // keys == island names
 }
-
-type IslandDetails = {
-  cookieStoreId: CookieStoreId
-} & ContextualIdentityDetails
-
-type IslandSettings = { [key: string]: IslandDetails }
-type RouteSettings = StoredRouteSettings

@@ -1,4 +1,4 @@
-import { Constants } from "../Types"
+import { Constants } from "../Constants"
 import * as PageActions from "./PageActions"
 import * as PageElements from "./PageElements"
 

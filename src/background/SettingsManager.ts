@@ -1,9 +1,10 @@
+import { Constants } from "../Constants"
+import { ContextualIdentityDetails } from "../ContextualIdentity"
 import {
-  Constants,
-  ContextualIdentityDetails,
   StoredIslandSettings,
   StoredRouteSettings,
-} from "../Types"
+  StorageWrapper,
+} from "../StorageWrapper"
 import { Util } from "./Util"
 
 export class SettingsManager {
@@ -88,36 +89,29 @@ export class SettingsManager {
   private async loadSettingsFromStorage(): Promise<void> {
     console.log("loadSettingsFromStorage")
 
-    return Promise.all([
-      this.loadIslandSettingsFromStorage(),
-      this.loadRouteSettingsFromStorage(),
-    ]).then((_) => {})
+    const storedSettings = await StorageWrapper.getStoredSettings()
+
+    this.updateRouteSettingsFromStorage(storedSettings.routes)
   }
 
   /**
-   * Load route settings from storage.
+   * Update route settings from storage.
    */
-  private async loadRouteSettingsFromStorage(): Promise<void> {
-    const routes: StoredRouteSettings =
-      (await browser.storage.local.get(Constants.routesStorageKey)[
-        Constants.routesStorageKey
-      ]) ?? {}
-
-    this._settings.routes = routes
+  private async updateRouteSettingsFromStorage(
+    storedRoutes: StoredRouteSettings,
+  ): Promise<void> {
+    this._settings.routes = storedRoutes
   }
 
   /**
-   * Load island settings from storage.
+   * Update island settings from storage.
    */
-  private async loadIslandSettingsFromStorage(): Promise<void> {
-    const islandCIDetails: StoredIslandSettings =
-      (await browser.storage.local.get(Constants.islandsStorageKey))[
-        Constants.islandsStorageKey
-      ] ?? {}
-
+  private async updateIslandSettingsFromStorage(
+    storedIslands: StoredIslandSettings,
+  ): Promise<void> {
     const islandSettings: [string, IslandDetails][] = await Promise.all(
       Object.entries(
-        islandCIDetails,
+        storedIslands,
       ).map((details: [string, ContextualIdentityDetails]) =>
         this.islandCIDetailsToIsland(details),
       ),

@@ -1,11 +1,9 @@
+import { Constants } from "../Constants"
 import {
-  Constants,
-  StoredSettings,
-  StoredIslandSettings,
   ContextualIdentityColor,
   ContextualIdentityIcon,
-} from "../Types"
-
+} from "../ContextualIdentity"
+import { StoredSettings, StorageWrapper } from "../StorageWrapper"
 import * as PageElements from "./PageElements"
 
 export async function renderTables(): Promise<void> {
@@ -13,12 +11,7 @@ export async function renderTables(): Promise<void> {
   // do rows stuff
   // based on storage
 
-  const settings: StoredSettings = <StoredSettings>(
-    ((await browser.storage.local.get([
-      Constants.islandsStorageKey,
-      Constants.routesStorageKey,
-    ])) ?? { islands: {}, routes: {} })
-  )
+  const settings: StoredSettings = await StorageWrapper.getStoredSettings()
 
   console.log(settings)
 
@@ -27,11 +20,10 @@ export async function renderTables(): Promise<void> {
   )
 
   for (const islandRow of islandRows) {
-    islandRow.configureHTMLRow(
-      PageElements.islandTable.insertRow(
-        PageElements.islandTable.rows.length - 1,
-      ),
+    const newTableRow = PageElements.islandTable.insertRow(
+      PageElements.islandTable.rows.length - 1,
     )
+    islandRow.configureHTMLRow(newTableRow)
   }
 }
 

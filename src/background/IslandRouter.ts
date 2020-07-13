@@ -1,4 +1,4 @@
-import { Constants } from "../Types"
+import { Constants } from "../Constants"
 import { CookieStoreId, SettingsManager } from "./SettingsManager"
 
 /**

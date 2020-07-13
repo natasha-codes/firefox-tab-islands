@@ -1,4 +1,9 @@
-import { Constants } from "../Constants"
+import {
+  Constants,
+  ContextualIdentityDetails,
+  StoredIslandSettings,
+  StoredRouteSettings,
+} from "../Types"
 import { Util } from "./Util"
 
 export class SettingsManager {
@@ -93,7 +98,7 @@ export class SettingsManager {
    * Load route settings from storage.
    */
   private async loadRouteSettingsFromStorage(): Promise<void> {
-    const routes: { [key: string]: string } =
+    const routes: StoredRouteSettings =
       (await browser.storage.local.get(Constants.routesStorageKey)[
         Constants.routesStorageKey
       ]) ?? {}
@@ -105,7 +110,7 @@ export class SettingsManager {
    * Load island settings from storage.
    */
   private async loadIslandSettingsFromStorage(): Promise<void> {
-    const islandCIDetails: { [key: string]: ContextualIdentityDetails } =
+    const islandCIDetails: StoredIslandSettings =
       (await browser.storage.local.get(Constants.islandsStorageKey))[
         Constants.islandsStorageKey
       ] ?? {}
@@ -182,42 +187,14 @@ export class SettingsManager {
 
 export type CookieStoreId = string
 
-export interface Settings {
+interface Settings {
   islands: IslandSettings
   routes: RouteSettings
 }
-
-type IslandSettings = { [key: string]: IslandDetails }
-type RouteSettings = { [key: string]: string }
 
 type IslandDetails = {
   cookieStoreId: CookieStoreId
 } & ContextualIdentityDetails
 
-// ref - https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/contextualIdentities/create
-interface ContextualIdentityDetails {
-  color?:
-    | "blue"
-    | "turquoise"
-    | "green"
-    | "yellow"
-    | "orange"
-    | "red"
-    | "pink"
-    | "purple"
-    | "toolbar"
-  icon?:
-    | "fingerprint"
-    | "briefcase"
-    | "dollar"
-    | "cart"
-    | "circle"
-    | "gift"
-    | "vacation"
-    | "food"
-    | "fruit"
-    | "pet"
-    | "tree"
-    | "chill"
-    | "fence"
-}
+type IslandSettings = { [key: string]: IslandDetails }
+type RouteSettings = StoredRouteSettings

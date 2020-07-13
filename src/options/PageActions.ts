@@ -1,4 +1,3 @@
-import { Constants } from "../Constants"
 import {
   ContextualIdentityColor,
   ContextualIdentityIcon,

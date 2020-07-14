@@ -9,3 +9,5 @@ export const islandTemplateSubmitButton: HTMLButtonElement = <
 export const islandTable: HTMLTableElement = <HTMLTableElement>(
   $("islands-table")
 )
+
+export const routeTable: HTMLTableElement = <HTMLTableElement>$("routes-table")

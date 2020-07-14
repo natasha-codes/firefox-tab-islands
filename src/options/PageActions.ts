@@ -2,19 +2,23 @@ import {
   ContextualIdentityColor,
   ContextualIdentityIcon,
 } from "../ContextualIdentity"
-import { Settings, StorageWrapper } from "../StorageWrapper"
+import {
+  Settings,
+  StorageWrapper,
+  IslandSettings,
+  RouteSettings,
+} from "../StorageWrapper"
 import * as PageElements from "./PageElements"
 
 export async function renderTables(): Promise<void> {
-  // get from storage
-  // do rows stuff
-  // based on storage
-
   const settings: Settings = await StorageWrapper.getStoredSettings()
 
-  console.log(settings)
+  renderIslandsTable(settings.islands)
+  renderRoutesTable(settings.routes)
+}
 
-  const islandRows: IslandRow[] = Object.entries(settings.islands).map(
+function renderIslandsTable(islandSettings: IslandSettings) {
+  const islandRows: IslandRow[] = Object.entries(islandSettings).map(
     ([name, { color, icon }]) => new IslandRow(name, color, icon),
   )
 
@@ -23,6 +27,19 @@ export async function renderTables(): Promise<void> {
       PageElements.islandTable.rows.length - 1,
     )
     islandRow.configureHTMLRow(newTableRow)
+  }
+}
+
+function renderRoutesTable(routeSettings: RouteSettings) {
+  const routeRows: RouteRow[] = Object.entries(routeSettings).map(
+    ([url, island]) => new RouteRow(url, island),
+  )
+
+  for (const routeRow of routeRows) {
+    const newRouteRow = PageElements.routeTable.insertRow(
+      PageElements.routeTable.rows.length - 1,
+    )
+    routeRow.configureHTMLRow(newRouteRow)
   }
 }
 
@@ -76,5 +93,23 @@ class IslandRow {
     nameCell.innerText = this.name
     colorCell.innerText = this.color
     iconCell.innerText = this.icon
+  }
+}
+
+class RouteRow {
+  url: string
+  island: string
+
+  constructor(url: string, island: string) {
+    this.url = url
+    this.island = island
+  }
+
+  configureHTMLRow(htmlRow: HTMLTableRowElement) {
+    const urlCell = htmlRow.insertCell()
+    const islandCell = htmlRow.insertCell()
+
+    urlCell.innerText = this.url
+    islandCell.innerText = this.island
   }
 }

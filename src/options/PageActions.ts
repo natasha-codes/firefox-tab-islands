@@ -57,13 +57,12 @@ export async function exportConfigFile(): Promise<void> {
 namespace Storage {
   export async function addIslandFromTemplateRow(): Promise<void> {
     const name = Islands.TemplateRow.nameInput.value
-    const color: ContextualIdentityColor =
-      ContextualIdentityColor[Islands.TemplateRow.colorSelect.value]
-    const icon: ContextualIdentityIcon =
-      ContextualIdentityIcon[Islands.TemplateRow.iconSelect.value]
 
-    console.log("colorSelect.value: ", Islands.TemplateRow.colorSelect.value)
-    console.log("iconSelect.value: ", Islands.TemplateRow.iconSelect.value)
+    const colorValue = Islands.TemplateRow.colorSelect.value
+    const color: ContextualIdentityColor = ContextualIdentityColor[colorValue]
+
+    const iconValue = Islands.TemplateRow.iconSelect.value
+    const icon: ContextualIdentityIcon = ContextualIdentityIcon[iconValue]
 
     if (name === "" || !color || !icon) {
       return

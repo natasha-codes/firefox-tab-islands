@@ -1,20 +1,13 @@
-import { Constants } from "../Constants"
-import * as PageActions from "./PageActions"
-import { Islands } from "./PageElements"
+import { renderTables, reloadPage, addNewIsland } from "./PageActions"
+import { Islands, Routes } from "./PageElements"
 
-browser.storage.onChanged.addListener((_, areaName) => {
-  if (areaName !== Constants.storageArea) {
-    return
-  }
+Islands.TemplateRow.submitButton.onclick = async () => {
+  await addNewIsland().catch((e) =>
+    console.error("Failed to add new island: ", e),
+  )
 
-  PageActions.renderTables()
-})
-
-Islands.TemplateRow.submitButton.onclick = async (_): Promise<void> => {
-  // Extract template info
-  // Create new island with it
-  await PageActions.addNewIsland()
-  console.log("Island added")
+  reloadPage()
+  renderTables()
 }
 
-PageActions.renderTables().then(() => console.log("Table rendering complete"))
+renderTables().then(() => console.log("Table rendering complete"))

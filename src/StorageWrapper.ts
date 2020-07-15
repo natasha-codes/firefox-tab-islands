@@ -1,16 +1,15 @@
 import { ContextualIdentityDetails } from "./ContextualIdentity"
-import { Constants } from "./Constants"
 
 export class StorageWrapper {
   static async getStoredSettings(): Promise<Settings> {
     const rawStoredSettings = await browser.storage.local.get([
-      Constants.islandsStorageKey,
-      Constants.routesStorageKey,
+      StorageConstants.islandsStorageKey,
+      StorageConstants.routesStorageKey,
     ])
 
     return {
-      islands: rawStoredSettings[Constants.islandsStorageKey] ?? {},
-      routes: rawStoredSettings[Constants.routesStorageKey] ?? {},
+      islands: rawStoredSettings[StorageConstants.islandsStorageKey] ?? {},
+      routes: rawStoredSettings[StorageConstants.routesStorageKey] ?? {},
     }
   }
 
@@ -23,11 +22,18 @@ export class StorageWrapper {
     name: string,
     ciDetails: ContextualIdentityDetails,
   ): Promise<boolean> {
-    if (name in (await this.getStoredSettings()).islands) {
+    let islands = (await this.getStoredSettings()).islands
+
+    if (name in islands) {
       return false
     }
 
-    await browser.storage.local.set({ [name]: ciDetails })
+    islands[name] = ciDetails
+
+    await browser.storage.local.set({
+      [StorageConstants.islandsStorageKey]: islands,
+    })
+
     return true
   }
 }
@@ -39,3 +45,8 @@ export interface Settings {
 
 export type IslandSettings = { [key: string]: ContextualIdentityDetails }
 export type RouteSettings = { [key: string]: string }
+
+class StorageConstants {
+  static islandsStorageKey: string = "islands"
+  static routesStorageKey: string = "routes"
+}

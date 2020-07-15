@@ -11,14 +11,27 @@ import {
 import { Islands, Routes } from "./PageElements"
 
 export async function renderTables(): Promise<void> {
+  console.log("Rendering tables")
+
   Rendering.renderPageFromSettings(await StorageWrapper.getStoredSettings())
+
+  console.log("Rendering tables complete")
+}
+
+export function reloadPage() {
+  console.log("Reloading page")
+
+  Rendering.reloadPage()
+
+  console.log("Reloading page complete")
 }
 
 export async function addNewIsland(): Promise<void> {
+  console.log("Adding island")
+
   await Storage.addIslandFromTemplateRow()
 
-  // Need to trigger a refresh
-  renderTables()
+  console.log("Adding island complete")
 }
 
 export async function addNewRoute(): Promise<void> {
@@ -44,22 +57,29 @@ export async function exportConfigFile(): Promise<void> {
 namespace Storage {
   export async function addIslandFromTemplateRow(): Promise<void> {
     const name = Islands.TemplateRow.nameInput.value
-    const color = ContextualIdentityColor[Islands.TemplateRow.colorSelect.value]
-    const icon = ContextualIdentityIcon[Islands.TemplateRow.iconSelect.value]
+    const color: ContextualIdentityColor =
+      ContextualIdentityColor[Islands.TemplateRow.colorSelect.value]
+    const icon: ContextualIdentityIcon =
+      ContextualIdentityIcon[Islands.TemplateRow.iconSelect.value]
 
-    if (name === "") {
+    console.log("colorSelect.value: ", Islands.TemplateRow.colorSelect.value)
+    console.log("iconSelect.value: ", Islands.TemplateRow.iconSelect.value)
+
+    if (name === "" || !color || !icon) {
       return
     }
 
-    if (await StorageWrapper.createIsland(name, { color, icon })) {
-      console.log(`Island ${name} created!`)
-    } else {
+    if (!(await StorageWrapper.createIsland(name, { color, icon }))) {
       console.error(`Island ${name} already existed!`)
     }
   }
 }
 
 namespace Rendering {
+  export function reloadPage() {
+    location.reload()
+  }
+
   export function renderPageFromSettings(settings: Settings) {
     renderIslandsTableTemplateRow()
     renderIslandsTableSettingsRows(settings.islands)
@@ -71,14 +91,14 @@ namespace Rendering {
   function renderIslandsTableTemplateRow() {
     Islands.TemplateRow.nameInput.placeholder = "Island name"
 
-    for (const color of Object.values(ContextualIdentityColor)) {
+    for (const color of Object.keys(ContextualIdentityColor)) {
       const option = <HTMLOptionElement>document.createElement("option")
       option.value = color
       option.innerText = color
       Islands.TemplateRow.colorSelect.add(option)
     }
 
-    for (const icon of Object.values(ContextualIdentityIcon)) {
+    for (const icon of Object.keys(ContextualIdentityIcon)) {
       const option = <HTMLOptionElement>document.createElement("option")
       option.value = icon
       option.innerText = icon

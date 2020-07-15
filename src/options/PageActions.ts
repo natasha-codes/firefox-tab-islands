@@ -8,7 +8,7 @@ import {
   IslandSettings,
   RouteSettings,
 } from "../StorageWrapper"
-import * as PageElements from "./PageElements"
+import { Island, Route } from "./PageElements"
 
 export async function renderTables(): Promise<void> {
   const settings: Settings = await StorageWrapper.getStoredSettings()
@@ -18,14 +18,16 @@ export async function renderTables(): Promise<void> {
 }
 
 function renderIslandsTable(islandSettings: IslandSettings) {
+  // Populate template row
+  Island.TemplateRow.nameInput.placeholder = "Island name"
+
+  // Render island rows
   const islandRows: IslandRow[] = Object.entries(islandSettings).map(
     ([name, { color, icon }]) => new IslandRow(name, color, icon),
   )
 
   for (const islandRow of islandRows) {
-    const newTableRow = PageElements.islandTable.insertRow(
-      PageElements.islandTable.rows.length - 1,
-    )
+    const newTableRow = Island.table.insertRow(Island.table.rows.length - 1)
     islandRow.configureHTMLRow(newTableRow)
   }
 }
@@ -36,9 +38,7 @@ function renderRoutesTable(routeSettings: RouteSettings) {
   )
 
   for (const routeRow of routeRows) {
-    const newRouteRow = PageElements.routeTable.insertRow(
-      PageElements.routeTable.rows.length - 1,
-    )
+    const newRouteRow = Route.table.insertRow(Route.table.rows.length - 1)
     routeRow.configureHTMLRow(newRouteRow)
   }
 }

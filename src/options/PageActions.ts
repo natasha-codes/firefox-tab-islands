@@ -8,37 +8,65 @@ import {
   IslandSettings,
   RouteSettings,
 } from "../StorageWrapper"
-import { Island, Route } from "./PageElements"
+import { Islands, Routes } from "./PageElements"
 
 export async function renderTables(): Promise<void> {
   const settings: Settings = await StorageWrapper.getStoredSettings()
 
-  renderIslandsTable(settings.islands)
-  renderRoutesTable(settings.routes)
+  renderIslandsTableTemplateRow()
+  renderIslandsTableSettingsRows(settings.islands)
+
+  renderRoutesTableTemplateRow(Object.keys(settings.islands))
+  renderRoutesTableSettingsRows(settings.routes)
 }
 
-function renderIslandsTable(islandSettings: IslandSettings) {
-  // Populate template row
-  Island.TemplateRow.nameInput.placeholder = "Island name"
+function renderIslandsTableTemplateRow() {
+  Islands.TemplateRow.nameInput.placeholder = "Island name"
 
-  // Render island rows
+  for (const color of Object.values(ContextualIdentityColor)) {
+    const option = <HTMLOptionElement>document.createElement("option")
+    option.value = color
+    option.innerText = color
+    Islands.TemplateRow.colorSelect.add(option)
+  }
+
+  for (const icon of Object.values(ContextualIdentityIcon)) {
+    const option = <HTMLOptionElement>document.createElement("option")
+    option.value = icon
+    option.innerText = icon
+    Islands.TemplateRow.iconSelect.add(option)
+  }
+}
+
+function renderIslandsTableSettingsRows(islandSettings: IslandSettings) {
   const islandRows: IslandRow[] = Object.entries(islandSettings).map(
     ([name, { color, icon }]) => new IslandRow(name, color, icon),
   )
 
   for (const islandRow of islandRows) {
-    const newTableRow = Island.table.insertRow(Island.table.rows.length - 1)
+    const newTableRow = Islands.table.insertRow(Islands.table.rows.length - 1)
     islandRow.configureHTMLRow(newTableRow)
   }
 }
 
-function renderRoutesTable(routeSettings: RouteSettings) {
+function renderRoutesTableTemplateRow(islandNames: string[]) {
+  Routes.TemplateRow.urlInput.placeholder = "URL fragment"
+
+  for (const island of islandNames) {
+    const option = <HTMLOptionElement>document.createElement("option")
+    option.value = island
+    option.innerText = island
+    Routes.TemplateRow.islandSelect.add(option)
+  }
+}
+
+function renderRoutesTableSettingsRows(routeSettings: RouteSettings) {
   const routeRows: RouteRow[] = Object.entries(routeSettings).map(
     ([url, island]) => new RouteRow(url, island),
   )
 
   for (const routeRow of routeRows) {
-    const newRouteRow = Route.table.insertRow(Route.table.rows.length - 1)
+    const newRouteRow = Routes.table.insertRow(Routes.table.rows.length - 1)
     routeRow.configureHTMLRow(newRouteRow)
   }
 }

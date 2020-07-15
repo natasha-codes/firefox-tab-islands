@@ -1,6 +1,6 @@
 import { Constants } from "../Constants"
 import * as PageActions from "./PageActions"
-import * as PageElements from "./PageElements"
+import { Islands } from "./PageElements"
 
 browser.storage.onChanged.addListener((_, areaName) => {
   if (areaName !== Constants.storageArea) {
@@ -10,7 +10,7 @@ browser.storage.onChanged.addListener((_, areaName) => {
   PageActions.renderTables()
 })
 
-PageElements.islandTemplateSubmitButton.onclick = async (_): Promise<void> => {
+Islands.TemplateRow.submitButton.onclick = async (_): Promise<void> => {
   // Extract template info
   // Create new island with it
   await PageActions.addNewIsland()

@@ -18,15 +18,13 @@
       </tr>
       <tr id="islands-template-row">
         <td id="islands-template-row-name">
-          <input type="text" />
-        </td>
-        <td id="islands-template-row-icon">
-          <select name="icon" id="islands-template-row-icon-picker"></select>
+          <input id="islands-template-row-name-input" type="text" />
         </td>
         <td id="islands-template-row-color">
-          <select name="color" id="islands-template-row-color-picker">
-            <option value="bloo">bloo</option>
-          </select>
+          <select name="color" id="islands-template-row-color-select" />
+        </td>
+        <td id="islands-template-row-icon">
+          <select name="icon" id="islands-template-row-icon-select" />
         </td>
         <td id="islands-template-row-submit">
           <button id="islands-template-row-submit-button">Add</button>
@@ -39,15 +37,14 @@
       <tr>
         <th>URL</th>
         <th>Island</th>
+        <th hidden>Action</th>
       </tr>
       <tr id="routes-template-row">
         <td id="routes-template-row-url">
-          <input type="text" placeholder="Route URL" />
+          <input id="routes-template-row-url-input" type="text" />
         </td>
         <td id="routes-template-row-island">
-          <select name="icon" id="routes-template-row-icon-picker">
-            <option value="fist">fist</option>
-          </select>
+          <select name="icon" id="routes-template-row-icon-select" />
         </td>
         <td id="routes-template-row-submit">
           <button id="routes-template-row-submit-button">Add</button>

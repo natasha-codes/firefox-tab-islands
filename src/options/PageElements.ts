@@ -66,7 +66,7 @@ export namespace Islands {
 
       this.deleteButton = <HTMLButtonElement>document.createElement("button")
       this.deleteButton.innerText = "Delete"
-      this.deleteButton.onclick = this.onDeleteClicked
+      this.deleteButton.onclick = () => this.onDeleteClicked()
 
       this.onDeleteButtonClicked = onDeleteButtonClicked
 
@@ -112,7 +112,7 @@ export namespace Islands {
 
       this.submitButton = <HTMLButtonElement>document.createElement("button")
       this.submitButton.innerText = "Add"
-      this.submitButton.onclick = this.onSubmitClicked
+      this.submitButton.onclick = () => this.onSubmitClicked()
 
       this.onSubmitButtonClicked = onSubmitButtonClicked
 
@@ -191,7 +191,7 @@ export namespace Routes {
 
       this.deleteButton = <HTMLButtonElement>document.createElement("button")
       this.deleteButton.innerText = "Delete"
-      this.deleteButton.onclick = this.onDeleteClicked
+      this.deleteButton.onclick = () => this.onDeleteClicked()
 
       this.onDeleteButtonClicked = onDeleteButtonClicked
 
@@ -227,7 +227,7 @@ export namespace Routes {
 
       this.submitButton = <HTMLButtonElement>document.createElement("button")
       this.submitButton.innerText = "Add"
-      this.submitButton.onclick = this.onSubmitClicked
+      this.submitButton.onclick = () => this.onSubmitClicked()
 
       this.onSubmitButtonClicked = onSubmitButtonClicked
 

@@ -56,6 +56,7 @@ export async function exportConfigFile(): Promise<void> {
 
 namespace Storage {
   export async function addIslandFromTemplateRow(): Promise<void> {
+    /*
     const name = Islands.TemplateRow.nameInput.value
 
     const colorValue = Islands.TemplateRow.colorSelect.value
@@ -71,6 +72,7 @@ namespace Storage {
     if (!(await StorageWrapper.createIsland(name, { color, icon }))) {
       console.error(`Island ${name} already existed!`)
     }
+    */
   }
 }
 
@@ -81,31 +83,22 @@ namespace Rendering {
 
   export function renderPageFromSettings(settings: Settings) {
     renderIslandsTableTemplateRow()
-    renderIslandsTableSettingsRows(settings.islands)
+    // renderIslandsTableSettingsRows(settings.islands)
 
-    renderRoutesTableTemplateRow(Object.keys(settings.islands))
-    renderRoutesTableSettingsRows(settings.routes)
+    // renderRoutesTableTemplateRow(Object.keys(settings.islands))
+    // renderRoutesTableSettingsRows(settings.routes)
   }
 
   function renderIslandsTableTemplateRow() {
-    Islands.TemplateRow.nameInput.placeholder = "Island name"
-
-    for (const color of Object.keys(ContextualIdentityColor)) {
-      const option = <HTMLOptionElement>document.createElement("option")
-      option.value = color
-      option.innerText = color
-      Islands.TemplateRow.colorSelect.add(option)
-    }
-
-    for (const icon of Object.keys(ContextualIdentityIcon)) {
-      const option = <HTMLOptionElement>document.createElement("option")
-      option.value = icon
-      option.innerText = icon
-      Islands.TemplateRow.iconSelect.add(option)
-    }
+    /*
+    const row = Islands.table.insertRow()
+    const templateRow = new Islands.TemplateRow(row)
+    console.log(templateRow)
+    */
   }
 
   function renderIslandsTableSettingsRows(islandSettings: IslandSettings) {
+    /*
     const islandRows: IslandRow[] = Object.entries(islandSettings).map(
       ([name, { color, icon }]) => new IslandRow(name, color, icon),
     )
@@ -114,6 +107,7 @@ namespace Rendering {
       const newTableRow = Islands.table.insertRow(Islands.table.rows.length - 1)
       islandRow.configureHTMLRow(newTableRow)
     }
+    */
   }
 
   function renderRoutesTableTemplateRow(islandNames: string[]) {

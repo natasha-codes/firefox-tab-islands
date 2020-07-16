@@ -4,10 +4,6 @@ import {
   ContextualIdentityDetails,
 } from "../ContextualIdentity"
 
-function $<T extends HTMLElement>(id: string): T {
-  return <T>document.getElementById(id)
-}
-
 export namespace Islands {
   export class Table {
     private table: HTMLTableElement
@@ -43,27 +39,14 @@ export namespace Islands {
       this.deleteButton.innerText = "Delete"
       this.deleteButton.onclick = this.onDeleteClicked
 
-      SettingRow.addStringToRow(this.row, this.name)
-      SettingRow.addStringToRow(this.row, this.color)
-      SettingRow.addStringToRow(this.row, this.icon)
-      SettingRow.addElementToRow(this.row, this.deleteButton)
+      addStringToRow(this.row, this.name)
+      addStringToRow(this.row, this.color)
+      addStringToRow(this.row, this.icon)
+      addElementToRow(this.row, this.deleteButton)
     }
 
     private async onDeleteClicked(): Promise<void> {
       console.log(`island ${name} delete clicked`)
-    }
-
-    private static addStringToRow(row: HTMLTableRowElement, value: string) {
-      const cell = row.insertCell()
-      cell.innerText = value
-    }
-
-    private static addElementToRow<E extends HTMLElement>(
-      row: HTMLTableRowElement,
-      element: E,
-    ) {
-      const cell = row.insertCell()
-      cell.appendChild(element)
     }
   }
 
@@ -79,13 +62,13 @@ export namespace Islands {
 
       this.nameInput = <HTMLInputElement>document.createElement("input")
       this.nameInput.type = "text"
-      this.nameInput.placeholder = "SECONDARY Island name"
+      this.nameInput.placeholder = "Island name"
 
-      this.colorSelect = TemplateRow.createSelectWithOptions(
+      this.colorSelect = createSelectWithOptions(
         Object.keys(ContextualIdentityColor),
       )
 
-      this.iconSelect = TemplateRow.createSelectWithOptions(
+      this.iconSelect = createSelectWithOptions(
         Object.keys(ContextualIdentityIcon),
       )
 
@@ -93,54 +76,112 @@ export namespace Islands {
       this.submitButton.innerText = "Add"
       this.submitButton.onclick = this.onSubmitClicked
 
-      TemplateRow.addElementToRow(this.row, this.nameInput)
-      TemplateRow.addElementToRow(this.row, this.colorSelect)
-      TemplateRow.addElementToRow(this.row, this.iconSelect)
-      TemplateRow.addElementToRow(this.row, this.submitButton)
+      addElementToRow(this.row, this.nameInput)
+      addElementToRow(this.row, this.colorSelect)
+      addElementToRow(this.row, this.iconSelect)
+      addElementToRow(this.row, this.submitButton)
     }
 
     private async onSubmitClicked(): Promise<void> {
       console.log("island submit clicked")
     }
-
-    private static addElementToRow<E extends HTMLElement>(
-      row: HTMLTableRowElement,
-      element: E,
-    ) {
-      const cell = row.insertCell()
-      cell.appendChild(element)
-    }
-
-    private static createSelectWithOptions(
-      options: string[],
-    ): HTMLSelectElement {
-      const select = <HTMLSelectElement>document.createElement("select")
-      for (const optionValue of options) {
-        const option = <HTMLOptionElement>document.createElement("option")
-        option.value = optionValue
-        option.innerText = optionValue
-        select.add(option)
-      }
-
-      return select
-    }
   }
 }
 
 export namespace Routes {
-  export const table: HTMLTableElement = <HTMLTableElement>$("routes-table")
+  export class Table {
+    private table: HTMLTableElement
+    private templateRow: TemplateRow
+    private settingRows: SettingRow[]
 
-  export namespace TemplateRow {
-    export const urlInput: HTMLInputElement = <HTMLInputElement>(
-      $("routes-template-row-url-input")
-    )
+    constructor(islands: string[]) {
+      this.table = $<HTMLTableElement>("routes-table")
 
-    export const islandSelect: HTMLSelectElement = <HTMLSelectElement>(
-      $("routes-template-row-icon-select")
-    )
-
-    export const submitButton: HTMLButtonElement = <HTMLButtonElement>(
-      $("routes-template-row-submit-button")
-    )
+      this.templateRow = new TemplateRow(this.table.insertRow(), islands)
+    }
   }
+
+  class SettingRow {
+    private row: HTMLTableRowElement
+    private urlFragment: string
+    private island: string
+    private deleteButton: HTMLButtonElement
+
+    constructor(row: HTMLTableRowElement, urlFragment: string, island: string) {
+      this.row = row
+
+      this.urlFragment = urlFragment
+      this.island = island
+
+      this.deleteButton = <HTMLButtonElement>document.createElement("button")
+      this.deleteButton.innerText = "Delete"
+      this.deleteButton.onclick = this.onDeleteClicked
+
+      addStringToRow(this.row, this.urlFragment)
+      addStringToRow(this.row, this.island)
+      addElementToRow(this.row, this.deleteButton)
+    }
+
+    private async onDeleteClicked(): Promise<void> {
+      console.log(`route ${this.urlFragment} delete clicked`)
+    }
+  }
+
+  export class TemplateRow {
+    private row: HTMLTableRowElement
+    private urlFragmentInput: HTMLInputElement
+    private islandSelect: HTMLSelectElement
+    private submitButton: HTMLButtonElement
+
+    constructor(row: HTMLTableRowElement, islands: string[]) {
+      this.row = row
+
+      this.urlFragmentInput = <HTMLInputElement>document.createElement("input")
+      this.urlFragmentInput.type = "text"
+      this.urlFragmentInput.placeholder = "URL fragment"
+
+      this.islandSelect = createSelectWithOptions(islands)
+
+      this.submitButton = <HTMLButtonElement>document.createElement("button")
+      this.submitButton.innerText = "Add"
+      this.submitButton.onclick = this.onSubmitClicked
+
+      addElementToRow(this.row, this.urlFragmentInput)
+      addElementToRow(this.row, this.islandSelect)
+      addElementToRow(this.row, this.submitButton)
+    }
+
+    private async onSubmitClicked(): Promise<void> {
+      console.log("route submit clicked")
+    }
+  }
+}
+
+function $<T extends HTMLElement>(id: string): T {
+  return <T>document.getElementById(id)
+}
+
+function addElementToRow<E extends HTMLElement>(
+  row: HTMLTableRowElement,
+  element: E,
+) {
+  const cell = row.insertCell()
+  cell.appendChild(element)
+}
+
+function addStringToRow(row: HTMLTableRowElement, value: string) {
+  const cell = row.insertCell()
+  cell.innerText = value
+}
+
+function createSelectWithOptions(options: string[]): HTMLSelectElement {
+  const select = <HTMLSelectElement>document.createElement("select")
+  for (const optionValue of options) {
+    const option = <HTMLOptionElement>document.createElement("option")
+    option.value = optionValue
+    option.innerText = optionValue
+    select.add(option)
+  }
+
+  return select
 }

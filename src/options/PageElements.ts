@@ -3,15 +3,22 @@ import {
   ContextualIdentityIcon,
   ContextualIdentityDetails,
 } from "../ContextualIdentity"
+import { RouteSettings, IslandSettings } from "../StorageWrapper"
 
 export namespace Islands {
   export class Table {
     private table: HTMLTableElement
     private templateRow: TemplateRow
-    private settingRows: SettingRow[]
+    private settingRows: SettingRow[] = []
 
-    constructor() {
+    constructor(islands: IslandSettings) {
       this.table = $<HTMLTableElement>("islands-table")
+
+      for (const [island, ciDetails] of Object.entries(islands)) {
+        this.settingRows.push(
+          new SettingRow(this.table.insertRow(), island, ciDetails),
+        )
+      }
 
       this.templateRow = new TemplateRow(this.table.insertRow())
     }
@@ -46,7 +53,7 @@ export namespace Islands {
     }
 
     private async onDeleteClicked(): Promise<void> {
-      console.log(`island ${name} delete clicked`)
+      console.log(`island ${this.name} delete clicked`)
     }
   }
 
@@ -92,10 +99,16 @@ export namespace Routes {
   export class Table {
     private table: HTMLTableElement
     private templateRow: TemplateRow
-    private settingRows: SettingRow[]
+    private settingRows: SettingRow[] = []
 
-    constructor(islands: string[]) {
+    constructor(routes: RouteSettings, islands: string[]) {
       this.table = $<HTMLTableElement>("routes-table")
+
+      for (const [urlFragment, island] of Object.entries(routes)) {
+        this.settingRows.push(
+          new SettingRow(this.table.insertRow(), urlFragment, island),
+        )
+      }
 
       this.templateRow = new TemplateRow(this.table.insertRow(), islands)
     }

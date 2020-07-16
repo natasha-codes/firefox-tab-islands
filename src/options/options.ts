@@ -26,8 +26,10 @@ function onIslandSubmitButtonClicked(
   island: string,
   ciDetails: ContextualIdentityDetails,
 ) {
-  PageActions.createIsland(island, ciDetails).then(() => {
-    PageActions.reloadPage()
+  PageActions.createIsland(island, ciDetails).then((success) => {
+    if (success) {
+      PageActions.reloadPage()
+    }
   })
 }
 
@@ -35,20 +37,26 @@ function onIslandDeleteButtonClicked(
   island: string,
   ciDetails: ContextualIdentityDetails,
 ) {
-  PageActions.deleteIsland(island).then(() => {
-    PageActions.reloadPage()
+  PageActions.deleteIsland(island).then((success) => {
+    if (success) {
+      PageActions.reloadPage()
+    }
   })
 }
 
 function onRouteSubmitButtonClicked(urlFragment: string, island: string) {
-  PageActions.createRoute(urlFragment, island).then(() => {
-    PageActions.reloadPage()
+  PageActions.createRoute(urlFragment, island).then((success) => {
+    if (success) {
+      PageActions.reloadPage()
+    }
   })
 }
 
 function onRouteDeleteButtonClicked(urlFragment: string, island: string) {
-  PageActions.deleteRoute(urlFragment).then(() => {
-    PageActions.reloadPage()
+  PageActions.deleteRoute(urlFragment).then((success) => {
+    if (success) {
+      PageActions.reloadPage()
+    }
   })
 }
 

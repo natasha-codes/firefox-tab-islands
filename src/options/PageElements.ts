@@ -17,11 +17,12 @@ export namespace Islands {
     private settingRows: SettingRow[] = []
 
     constructor(
+      table: HTMLTableElement,
       islands: IslandSettings,
       onSubmitButtonClicked: OnButtonClicked,
       onDeleteButtonClicked: OnButtonClicked,
     ) {
-      this.table = $<HTMLTableElement>("islands-table")
+      this.table = table
 
       for (const [island, ciDetails] of Object.entries(islands)) {
         this.settingRows.push(
@@ -64,7 +65,7 @@ export namespace Islands {
       this.color = ciDetails.color
       this.icon = ciDetails.icon
 
-      this.deleteButton = <HTMLButtonElement>document.createElement("button")
+      this.deleteButton = document.createElement("button")
       this.deleteButton.innerText = "Delete"
       this.deleteButton.onclick = () => this.onDeleteClicked()
 
@@ -98,7 +99,7 @@ export namespace Islands {
     ) {
       this.row = row
 
-      this.nameInput = <HTMLInputElement>document.createElement("input")
+      this.nameInput = document.createElement("input")
       this.nameInput.type = "text"
       this.nameInput.placeholder = "Island name"
 
@@ -110,7 +111,7 @@ export namespace Islands {
         Object.keys(ContextualIdentityIcon),
       )
 
-      this.submitButton = <HTMLButtonElement>document.createElement("button")
+      this.submitButton = document.createElement("button")
       this.submitButton.innerText = "Add"
       this.submitButton.onclick = () => this.onSubmitClicked()
 
@@ -145,12 +146,13 @@ export namespace Routes {
     private settingRows: SettingRow[] = []
 
     constructor(
+      table: HTMLTableElement,
       routes: RouteSettings,
       islands: string[],
       onSubmitButtonClicked: OnButtonClicked,
       onDeleteButtonClicked: OnButtonClicked,
     ) {
-      this.table = $<HTMLTableElement>("routes-table")
+      this.table = table
 
       for (const [urlFragment, island] of Object.entries(routes)) {
         this.settingRows.push(
@@ -219,13 +221,13 @@ export namespace Routes {
     ) {
       this.row = row
 
-      this.urlFragmentInput = <HTMLInputElement>document.createElement("input")
+      this.urlFragmentInput = document.createElement("input")
       this.urlFragmentInput.type = "text"
       this.urlFragmentInput.placeholder = "URL fragment"
 
       this.islandSelect = createSelectWithOptions(islands)
 
-      this.submitButton = <HTMLButtonElement>document.createElement("button")
+      this.submitButton = document.createElement("button")
       this.submitButton.innerText = "Add"
       this.submitButton.onclick = () => this.onSubmitClicked()
 
@@ -245,10 +247,6 @@ export namespace Routes {
   }
 }
 
-function $<T extends HTMLElement>(id: string): T {
-  return <T>document.getElementById(id)
-}
-
 function addElementToRow<E extends HTMLElement>(
   row: HTMLTableRowElement,
   element: E,
@@ -263,9 +261,9 @@ function addStringToRow(row: HTMLTableRowElement, value: string) {
 }
 
 function createSelectWithOptions(options: string[]): HTMLSelectElement {
-  const select = <HTMLSelectElement>document.createElement("select")
+  const select = document.createElement("select")
   for (const optionValue of options) {
-    const option = <HTMLOptionElement>document.createElement("option")
+    const option = document.createElement("option")
     option.value = optionValue
     option.innerText = optionValue
     select.add(option)

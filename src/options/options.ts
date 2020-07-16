@@ -7,6 +7,7 @@ async function renderPage(): Promise<void> {
   const settings = await StorageWrapper.getStoredSettings()
 
   const islandsTable = new Islands.Table(
+    $<HTMLTableElement>("islands-table"),
     settings.islands,
     onIslandSubmitButtonClicked,
     onIslandDeleteButtonClicked,
@@ -14,12 +15,17 @@ async function renderPage(): Promise<void> {
   console.log(islandsTable)
 
   const routesTable = new Routes.Table(
+    $<HTMLTableElement>("routes-table"),
     settings.routes,
     Object.keys(settings.islands),
     onRouteSubmitButtonClicked,
     onRouteDeleteButtonClicked,
   )
   console.log(routesTable)
+}
+
+function $<T extends HTMLElement>(id: string): T {
+  return <T>document.getElementById(id)
 }
 
 function onIslandSubmitButtonClicked(

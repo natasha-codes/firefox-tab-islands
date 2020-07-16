@@ -1,4 +1,5 @@
 import { Islands, Routes } from "./PageElements"
+import * as PageActions from "./PageActions"
 import { StorageWrapper } from "../StorageWrapper"
 import { ContextualIdentityDetails } from "../ContextualIdentity"
 
@@ -25,22 +26,30 @@ function onIslandSubmitButtonClicked(
   island: string,
   ciDetails: ContextualIdentityDetails,
 ) {
-  console.log(`Submit clicked for island: ${island} => ${ciDetails}`)
+  PageActions.createIsland(island, ciDetails).then(() => {
+    PageActions.reloadPage()
+  })
 }
 
 function onIslandDeleteButtonClicked(
   island: string,
   ciDetails: ContextualIdentityDetails,
 ) {
-  console.log(`Delete clicked for island: ${island} => ${ciDetails}`)
+  PageActions.deleteIsland(island).then(() => {
+    PageActions.reloadPage()
+  })
 }
 
 function onRouteSubmitButtonClicked(urlFragment: string, island: string) {
-  console.log(`Submit clicked for route: ${urlFragment} => ${island}`)
+  PageActions.createRoute(urlFragment, island).then(() => {
+    PageActions.reloadPage()
+  })
 }
 
 function onRouteDeleteButtonClicked(urlFragment: string, island: string) {
-  console.log(`Delete clicked for route: ${urlFragment} => ${island}`)
+  PageActions.deleteRoute(urlFragment).then(() => {
+    PageActions.reloadPage()
+  })
 }
 
 renderPage().then(() => console.log("Page render complete"))

@@ -6,21 +6,38 @@ import {
 import { RouteSettings, IslandSettings } from "../StorageWrapper"
 
 export namespace Islands {
+  type OnButtonClicked = (
+    island: string,
+    ciDetails: ContextualIdentityDetails,
+  ) => void
+
   export class Table {
     private table: HTMLTableElement
     private templateRow: TemplateRow
     private settingRows: SettingRow[] = []
 
-    constructor(islands: IslandSettings) {
+    constructor(
+      islands: IslandSettings,
+      onSubmitButtonClicked: OnButtonClicked,
+      onDeleteButtonClicked: OnButtonClicked,
+    ) {
       this.table = $<HTMLTableElement>("islands-table")
 
       for (const [island, ciDetails] of Object.entries(islands)) {
         this.settingRows.push(
-          new SettingRow(this.table.insertRow(), island, ciDetails),
+          new SettingRow(
+            this.table.insertRow(),
+            island,
+            ciDetails,
+            onDeleteButtonClicked,
+          ),
         )
       }
 
-      this.templateRow = new TemplateRow(this.table.insertRow())
+      this.templateRow = new TemplateRow(
+        this.table.insertRow(),
+        onSubmitButtonClicked,
+      )
     }
   }
 
@@ -30,11 +47,16 @@ export namespace Islands {
     private color: ContextualIdentityColor
     private icon: ContextualIdentityIcon
     private deleteButton: HTMLButtonElement
+    private onDeleteButtonClicked: OnButtonClicked
 
     constructor(
       row: HTMLTableRowElement,
       name: string,
       ciDetails: ContextualIdentityDetails,
+      onDeleteButtonClicked: (
+        island: string,
+        ciDetails: ContextualIdentityDetails,
+      ) => void,
     ) {
       this.row = row
 
@@ -46,14 +68,19 @@ export namespace Islands {
       this.deleteButton.innerText = "Delete"
       this.deleteButton.onclick = this.onDeleteClicked
 
+      this.onDeleteButtonClicked = onDeleteButtonClicked
+
       addStringToRow(this.row, this.name)
       addStringToRow(this.row, this.color)
       addStringToRow(this.row, this.icon)
       addElementToRow(this.row, this.deleteButton)
     }
 
-    private async onDeleteClicked(): Promise<void> {
-      console.log(`island ${this.name} delete clicked`)
+    private onDeleteClicked() {
+      this.onDeleteButtonClicked(this.name, {
+        color: this.color,
+        icon: this.icon,
+      })
     }
   }
 
@@ -63,8 +90,12 @@ export namespace Islands {
     private colorSelect: HTMLSelectElement
     private iconSelect: HTMLSelectElement
     private submitButton: HTMLButtonElement
+    private onSubmitButtonClicked: OnButtonClicked
 
-    constructor(row: HTMLTableRowElement) {
+    constructor(
+      row: HTMLTableRowElement,
+      onSubmitButtonClicked: OnButtonClicked,
+    ) {
       this.row = row
 
       this.nameInput = <HTMLInputElement>document.createElement("input")
@@ -83,34 +114,60 @@ export namespace Islands {
       this.submitButton.innerText = "Add"
       this.submitButton.onclick = this.onSubmitClicked
 
+      this.onSubmitButtonClicked = onSubmitButtonClicked
+
       addElementToRow(this.row, this.nameInput)
       addElementToRow(this.row, this.colorSelect)
       addElementToRow(this.row, this.iconSelect)
       addElementToRow(this.row, this.submitButton)
     }
 
-    private async onSubmitClicked(): Promise<void> {
-      console.log("island submit clicked")
+    private onSubmitClicked() {
+      const name = this.nameInput.value
+
+      const colorValue = this.colorSelect.value
+      const color: ContextualIdentityColor = ContextualIdentityColor[colorValue]
+
+      const iconValue = this.iconSelect.value
+      const icon: ContextualIdentityIcon = ContextualIdentityIcon[iconValue]
+
+      this.onSubmitButtonClicked(name, { color, icon })
     }
   }
 }
 
 export namespace Routes {
+  type OnButtonClicked = (urlFragment: string, island: string) => void
+
   export class Table {
     private table: HTMLTableElement
     private templateRow: TemplateRow
     private settingRows: SettingRow[] = []
 
-    constructor(routes: RouteSettings, islands: string[]) {
+    constructor(
+      routes: RouteSettings,
+      islands: string[],
+      onSubmitButtonClicked: OnButtonClicked,
+      onDeleteButtonClicked: OnButtonClicked,
+    ) {
       this.table = $<HTMLTableElement>("routes-table")
 
       for (const [urlFragment, island] of Object.entries(routes)) {
         this.settingRows.push(
-          new SettingRow(this.table.insertRow(), urlFragment, island),
+          new SettingRow(
+            this.table.insertRow(),
+            urlFragment,
+            island,
+            onDeleteButtonClicked,
+          ),
         )
       }
 
-      this.templateRow = new TemplateRow(this.table.insertRow(), islands)
+      this.templateRow = new TemplateRow(
+        this.table.insertRow(),
+        islands,
+        onSubmitButtonClicked,
+      )
     }
   }
 
@@ -119,8 +176,14 @@ export namespace Routes {
     private urlFragment: string
     private island: string
     private deleteButton: HTMLButtonElement
+    private onDeleteButtonClicked: OnButtonClicked
 
-    constructor(row: HTMLTableRowElement, urlFragment: string, island: string) {
+    constructor(
+      row: HTMLTableRowElement,
+      urlFragment: string,
+      island: string,
+      onDeleteButtonClicked: OnButtonClicked,
+    ) {
       this.row = row
 
       this.urlFragment = urlFragment
@@ -130,13 +193,15 @@ export namespace Routes {
       this.deleteButton.innerText = "Delete"
       this.deleteButton.onclick = this.onDeleteClicked
 
+      this.onDeleteButtonClicked = onDeleteButtonClicked
+
       addStringToRow(this.row, this.urlFragment)
       addStringToRow(this.row, this.island)
       addElementToRow(this.row, this.deleteButton)
     }
 
     private async onDeleteClicked(): Promise<void> {
-      console.log(`route ${this.urlFragment} delete clicked`)
+      this.onDeleteButtonClicked(this.urlFragment, this.island)
     }
   }
 
@@ -145,8 +210,13 @@ export namespace Routes {
     private urlFragmentInput: HTMLInputElement
     private islandSelect: HTMLSelectElement
     private submitButton: HTMLButtonElement
+    private onSubmitButtonClicked: OnButtonClicked
 
-    constructor(row: HTMLTableRowElement, islands: string[]) {
+    constructor(
+      row: HTMLTableRowElement,
+      islands: string[],
+      onSubmitButtonClicked: OnButtonClicked,
+    ) {
       this.row = row
 
       this.urlFragmentInput = <HTMLInputElement>document.createElement("input")
@@ -159,13 +229,18 @@ export namespace Routes {
       this.submitButton.innerText = "Add"
       this.submitButton.onclick = this.onSubmitClicked
 
+      this.onSubmitButtonClicked = onSubmitButtonClicked
+
       addElementToRow(this.row, this.urlFragmentInput)
       addElementToRow(this.row, this.islandSelect)
       addElementToRow(this.row, this.submitButton)
     }
 
     private async onSubmitClicked(): Promise<void> {
-      console.log("route submit clicked")
+      this.onSubmitButtonClicked(
+        this.urlFragmentInput.value,
+        this.islandSelect.value,
+      )
     }
   }
 }

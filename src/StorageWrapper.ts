@@ -148,6 +148,26 @@ export class StorageWrapper {
 
     return true
   }
+
+  export async function importSettings() {
+
+  }
+
+  static async exportSettings(): Promise<void> {
+    const settings = await this.getStoredSettings()
+
+    const keysToExport = [
+      StorageConstants.islandsStorageKey,
+      StorageConstants.routesStorageKey,
+    ]
+    const settingsJSON = JSON.stringify(settings, keysToExport, 2)
+
+    const settingsBlob = new Blob([settingsJSON], { type: "application/json" })
+
+    browser.downloads.download({ url: URL.createObjectURL(settingsBlob) })
+
+    return
+  }
 }
 
 export interface Settings {

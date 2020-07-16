@@ -58,3 +58,7 @@ export async function deleteRoute(urlFragment: string): Promise<boolean> {
     return success
   })
 }
+
+export async function exportSettings(): Promise<void> {
+  return StorageWrapper.exportSettings()
+}

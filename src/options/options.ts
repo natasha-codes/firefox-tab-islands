@@ -1,4 +1,4 @@
-import { Islands, Routes } from "./PageElements"
+import { Islands, Routes, IO } from "./PageElements"
 import * as PageActions from "./PageActions"
 import { StorageWrapper } from "../StorageWrapper"
 import { ContextualIdentityDetails } from "../ContextualIdentity"
@@ -22,6 +22,14 @@ async function renderPage(): Promise<void> {
     onRouteDeleteButtonClicked,
   )
   console.log(routesTable)
+
+  new IO.ExportButton($<HTMLButtonElement>("export-button"), () =>
+    PageActions.exportSettings(),
+  )
+
+  new IO.ImportButton($<HTMLButtonElement>("import-button"), () =>
+    PageActions.importSettings(),
+  )
 }
 
 function $<T extends HTMLElement>(id: string): T {

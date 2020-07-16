@@ -247,6 +247,19 @@ export namespace Routes {
   }
 }
 
+export namespace IO {
+  type OnButtonClicked = () => void
+
+  export class ExportButton {
+    private button: HTMLButtonElement
+
+    constructor(button: HTMLButtonElement, onClicked: OnButtonClicked) {
+      this.button = button
+      this.button.onclick = onClicked
+    }
+  }
+}
+
 function addElementToRow<E extends HTMLElement>(
   row: HTMLTableRowElement,
   element: E,

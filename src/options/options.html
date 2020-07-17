@@ -28,10 +28,9 @@
     </table>
 
     <h2>Import/Export</h2>
-    <span>
-      <button id="import-button">Import</button>
-      <button id="export-button">Export</button>
-    </span>
+    <span><button id="export-button">Export</button></span>
+    <!-- TODO: understand how accept="*.json" is supposed to work -->
+    <input id="import-input" type="file" name="Import" accept="*.json" />
 
     <script src="options.js"></script>
   </body>

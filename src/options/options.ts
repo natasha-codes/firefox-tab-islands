@@ -27,8 +27,9 @@ async function renderPage(): Promise<void> {
     PageActions.exportSettings(),
   )
 
-  new IO.ImportButton($<HTMLButtonElement>("import-button"), () =>
-    PageActions.importSettings(),
+  new IO.ImportInput(
+    $<HTMLInputElement>("import-input"),
+    onSettingsFileSelected,
   )
 }
 
@@ -68,6 +69,14 @@ function onRouteSubmitButtonClicked(urlFragment: string, island: string) {
 
 function onRouteDeleteButtonClicked(urlFragment: string, island: string) {
   PageActions.deleteRoute(urlFragment).then((success) => {
+    if (success) {
+      PageActions.reloadPage()
+    }
+  })
+}
+
+function onSettingsFileSelected(file: File) {
+  PageActions.importSettingsFromFile(file).then((success) => {
     if (success) {
       PageActions.reloadPage()
     }

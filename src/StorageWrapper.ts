@@ -1,4 +1,8 @@
-import { ContextualIdentityDetails } from "./ContextualIdentity"
+import {
+  ContextualIdentityDetails,
+  ContextualIdentityColor,
+  ContextualIdentityIcon,
+} from "./ContextualIdentity"
 
 export class StorageWrapper {
   /**
@@ -149,55 +153,83 @@ export class StorageWrapper {
     return true
   }
 
-/**
- * Handle settings JSON upload, storing the settings in local storage
- *
- * ref - https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Working_with_files#Open_files_in_an_extension_using_a_file_picker
- */
+  static async importSettings(settingsJSON: any): Promise<boolean> {
+    const islands = settingsJSON?.islands
+    const routes = settingsJSON?.routes
 
-// NOTE: this cannot be defined as a lambda function as we will then not have
-// access to the correct proprty on this
-function handleFiles() {
-  // returns an array of files even when only one uploaded
-  const file = this.files[0]
+    console.log("settingsJSON: ", settingsJSON)
 
-  const reader = new FileReader()
+    if (!islands || !routes) {
+      console.warn("Both islands and routes must be present")
+      return false
+    }
 
-  reader.onload = (loaded) => {
-    // `string` here because we call `readAsText` below (don't love the api)
-    const parsed = JSON.parse(loaded.target.result as string)
+    let ourIslands: IslandSettings = {}
+    for (const island in islands) {
+      // JSON spec requires unique keys anyway
+      if (island in ourIslands) {
+        console.warn(`Island ${island} must be unique`)
+        return false
+      }
 
-    // TODO: valiadate JSON
-    browser.storage.local.set({
-      ...parsed,
+      const iconValue = islands[island]?.icon
+      const colorValue = islands[island]?.color
+
+      if (!colorValue || !iconValue) {
+        console.warn(`Island ${island} must contain a color and an icon`)
+        return false
+      }
+
+      const color: ContextualIdentityColor = ContextualIdentityColor[colorValue]
+      const icon: ContextualIdentityIcon = ContextualIdentityIcon[iconValue]
+
+      if (!color || !icon) {
+        console.warn("Color and icon values must be valid")
+        return false
+      }
+
+      ourIslands[island] = { color, icon }
+    }
+
+    let ourRoutes: RouteSettings = {}
+    for (const urlFragment in routes) {
+      // JSON spec requires unique keys anyway
+      if (urlFragment in ourRoutes) {
+        console.warn(`URL fragment ${urlFragment} must be unique`)
+        return false
+      }
+
+      const island = routes[urlFragment]
+
+      if (!(island in ourIslands)) {
+        console.warn(
+          `Island ${island} for URL fragment ${urlFragment} must exist`,
+        )
+        return false
+      }
+
+      ourRoutes[urlFragment] = island
+    }
+
+    await browser.storage.local.set({
+      [StorageConstants.islandsStorageKey]: ourIslands,
+      [StorageConstants.routesStorageKey]: ourRoutes,
     })
 
-    document.getElementById("status").innerHTML = "Settings saved!"
-  }
-
-  reader.readAsText(file)
-}
-
-document
-  .getElementById("settingsJSON")
-  .addEventListener("change", handleFiles, false)
-
-  export async function importSettings() {
-
+    return true
   }
 
   static async exportSettings(): Promise<void> {
     const settings = await this.getStoredSettings()
 
-    const keysToExport = [
-      StorageConstants.islandsStorageKey,
-      StorageConstants.routesStorageKey,
-    ]
-    const settingsJSON = JSON.stringify(settings, keysToExport, 2)
+    const settingsJSON = JSON.stringify(settings, null, 2)
 
     const settingsBlob = new Blob([settingsJSON], { type: "application/json" })
 
-    browser.downloads.download({ url: URL.createObjectURL(settingsBlob) })
+    browser.downloads.download({
+      filename: "tab-islands.json",
+      url: URL.createObjectURL(settingsBlob),
+    })
 
     return
   }

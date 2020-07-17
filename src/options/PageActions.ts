@@ -62,3 +62,31 @@ export async function deleteRoute(urlFragment: string): Promise<boolean> {
 export async function exportSettings(): Promise<void> {
   return StorageWrapper.exportSettings()
 }
+
+export async function importSettingsFromFile(file: File): Promise<boolean> {
+  return new Promise<boolean>((resolve, reject) => {
+    const reader = new FileReader()
+
+    reader.onload = (loaded) => {
+      try {
+        // `string` here because we call `readAsText` below
+        const settingsJSON = JSON.parse(loaded.target.result as string)
+
+        StorageWrapper.importSettings(settingsJSON).then((success) => {
+          if (success) {
+            console.log("Settings imported")
+          } else {
+            console.error("Settings could not be imported")
+          }
+
+          resolve(success)
+        })
+      } catch {
+        console.error("Settings file failed to parse")
+        reject()
+      }
+    }
+
+    reader.readAsText(file)
+  })
+}

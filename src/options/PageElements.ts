@@ -249,6 +249,7 @@ export namespace Routes {
 
 export namespace IO {
   type OnButtonClicked = () => void
+  type OnFileSelected = (file: File) => void
 
   export class ExportButton {
     private button: HTMLButtonElement
@@ -256,6 +257,22 @@ export namespace IO {
     constructor(button: HTMLButtonElement, onClicked: OnButtonClicked) {
       this.button = button
       this.button.onclick = onClicked
+    }
+  }
+
+  export class ImportInput {
+    private input: HTMLInputElement
+    private onFileSelected: OnFileSelected
+
+    constructor(input: HTMLInputElement, onFileSelected: OnFileSelected) {
+      this.input = input
+      this.input.onchange = () => this.onInputChanged()
+
+      this.onFileSelected = onFileSelected
+    }
+
+    private onInputChanged() {
+      this.onFileSelected(this.input.files[0])
     }
   }
 }

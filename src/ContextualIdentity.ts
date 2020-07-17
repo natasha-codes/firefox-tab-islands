@@ -28,6 +28,6 @@ export enum ContextualIdentityIcon {
 
 // ref - https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/contextualIdentities/create
 export interface ContextualIdentityDetails {
-  color?: ContextualIdentityColor
-  icon?: ContextualIdentityIcon
+  color: ContextualIdentityColor
+  icon: ContextualIdentityIcon
 }

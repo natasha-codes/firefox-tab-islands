@@ -1,16 +1,20 @@
 {
   "islands": {
     "amazon": {
-      "icon": "pet",
-      "color": "pink"
+      "icon": "Pet",
+      "color": "Pink"
     },
     "google": {
-      "icon": "fingerprint",
-      "color": "yellow"
+      "icon": "Fingerprint",
+      "color": "Yellow"
     },
     "big-blue": {
-      "color": "blue",
-      "icon": "chill"
+      "color": "Blue",
+      "icon": "Chill"
+    },
+    "big-blue": {
+      "color": "Red",
+      "icon": "Pet"
     }
   },
   "routes": {

@@ -1,12 +1,19 @@
 import { Constants } from "../Constants"
+import { ContextualIdentityDetails } from "../ContextualIdentity"
+import {
+  IslandSettings,
+  RouteSettings,
+  StorageWrapper,
+} from "../StorageWrapper"
 import { Util } from "./Util"
 
-export class SettingsManager {
-  public static shared: SettingsManager = new SettingsManager()
+export class CookieStoreManager {
+  public static shared: CookieStoreManager = new CookieStoreManager()
 
   private _settings: Settings = {
     islands: {},
     routes: {},
+    cookieStores: {},
   }
 
   private constructor() {}
@@ -19,7 +26,7 @@ export class SettingsManager {
     )
   }
 
-  public getMappedCookieStoreForUrl(url: string): null | CookieStoreId {
+  public getCookieStoreForUrl(url: string): null | CookieStoreId {
     const firstMatchingMappingKey = Object.keys(
       this._settings.routes,
     ).find((urlFragment) => url.includes(urlFragment))
@@ -29,7 +36,7 @@ export class SettingsManager {
     }
 
     const islandForUrl = this._settings.routes[firstMatchingMappingKey]
-    const cookieStoreId = this._settings.islands[islandForUrl]?.cookieStoreId
+    const cookieStoreId = this._settings.cookieStores[islandForUrl]
 
     if (!cookieStoreId) {
       console.error(`No cookie store id found for island: '${islandForUrl}'`)
@@ -71,7 +78,7 @@ export class SettingsManager {
     return Promise.all(
       Array.from(orphanedIslandNames).map((name) => {
         return browser.contextualIdentities.remove(
-          oldSettings.islands[name].cookieStoreId,
+          oldSettings.cookieStores[name],
         )
       }),
     ).then((_) => {})
@@ -83,61 +90,36 @@ export class SettingsManager {
   private async loadSettingsFromStorage(): Promise<void> {
     console.log("loadSettingsFromStorage")
 
-    return Promise.all([
-      this.loadIslandSettingsFromStorage(),
-      this.loadRouteSettingsFromStorage(),
-    ]).then((_) => {})
+    const storedSettings = await StorageWrapper.getStoredSettings()
+
+    this._settings.islands = storedSettings.islands
+    this._settings.routes = storedSettings.routes
+    this._settings.cookieStores = await this.getOrCreateCookieStoresForIslands(
+      storedSettings.islands,
+    )
   }
 
   /**
-   * Load route settings from storage.
+   * Update island settings from storage.
    */
-  private async loadRouteSettingsFromStorage(): Promise<void> {
-    const routes: { [key: string]: string } =
-      (await browser.storage.local.get(Constants.routesStorageKey)[
-        Constants.routesStorageKey
-      ]) ?? {}
+  private async getOrCreateCookieStoresForIslands(
+    storedIslands: IslandSettings,
+  ): Promise<{ [key: string]: CookieStoreId }> {
+    const storedIslandEntries: [
+      string,
+      ContextualIdentityDetails,
+    ][] = Object.entries(storedIslands)
 
-    this._settings.routes = routes
-  }
-
-  /**
-   * Load island settings from storage.
-   */
-  private async loadIslandSettingsFromStorage(): Promise<void> {
-    const islandCIDetails: { [key: string]: ContextualIdentityDetails } =
-      (await browser.storage.local.get(Constants.islandsStorageKey))[
-        Constants.islandsStorageKey
-      ] ?? {}
-
-    const islandSettings: [string, IslandDetails][] = await Promise.all(
-      Object.entries(
-        islandCIDetails,
-      ).map((details: [string, ContextualIdentityDetails]) =>
-        this.islandCIDetailsToIsland(details),
-      ),
+    const cookieStoreEntries: Promise<
+      [string, CookieStoreId]
+    >[] = storedIslandEntries.map(([name, ciDetails]) =>
+      this.getOrCreateCookieStoreForIsland(
+        name,
+        ciDetails,
+      ).then((cookieStoreId) => [name, cookieStoreId]),
     )
 
-    this._settings.islands = Object.fromEntries(islandSettings)
-  }
-
-  /**
-   * Fill out the island details for an island setting.
-   */
-  private async islandCIDetailsToIsland([islandName, ciDetails]: [
-    string,
-    ContextualIdentityDetails,
-  ]): Promise<[string, IslandDetails]> {
-    const island: IslandDetails = {
-      icon: ciDetails.icon,
-      color: ciDetails.color,
-      cookieStoreId: await this.getOrCreateCookieStoreForIsland(
-        islandName,
-        ciDetails,
-      ),
-    }
-
-    return [islandName, island]
+    return Object.fromEntries(await Promise.all(cookieStoreEntries))
   }
 
   /**
@@ -182,42 +164,8 @@ export class SettingsManager {
 
 export type CookieStoreId = string
 
-export interface Settings {
+interface Settings {
   islands: IslandSettings
   routes: RouteSettings
-}
-
-type IslandSettings = { [key: string]: IslandDetails }
-type RouteSettings = { [key: string]: string }
-
-type IslandDetails = {
-  cookieStoreId: CookieStoreId
-} & ContextualIdentityDetails
-
-// ref - https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/contextualIdentities/create
-interface ContextualIdentityDetails {
-  color?:
-    | "blue"
-    | "turquoise"
-    | "green"
-    | "yellow"
-    | "orange"
-    | "red"
-    | "pink"
-    | "purple"
-    | "toolbar"
-  icon?:
-    | "fingerprint"
-    | "briefcase"
-    | "dollar"
-    | "cart"
-    | "circle"
-    | "gift"
-    | "vacation"
-    | "food"
-    | "fruit"
-    | "pet"
-    | "tree"
-    | "chill"
-    | "fence"
+  cookieStores: { [key: string]: CookieStoreId } // keys == island names
 }

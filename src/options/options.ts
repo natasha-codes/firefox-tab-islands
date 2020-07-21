@@ -1,32 +1,86 @@
-/**
- * Handle settings JSON upload, storing the settings in local storage
- *
- * ref - https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Working_with_files#Open_files_in_an_extension_using_a_file_picker
- */
+import { Islands, Routes, IO } from "./PageElements"
+import * as PageActions from "./PageActions"
+import { StorageWrapper } from "../StorageWrapper"
+import { ContextualIdentityDetails } from "../ContextualIdentity"
 
-// NOTE: this cannot be defined as a lambda function as we will then not have
-// access to the correct proprty on this
-function handleFiles() {
-  // returns an array of files even when only one uploaded
-  const file = this.files[0]
+async function renderPage(): Promise<void> {
+  const settings = await StorageWrapper.getStoredSettings()
 
-  const reader = new FileReader()
+  const islandsTable = new Islands.Table(
+    $<HTMLTableElement>("islands-table"),
+    settings.islands,
+    onIslandSubmitButtonClicked,
+    onIslandDeleteButtonClicked,
+  )
+  console.log(islandsTable)
 
-  reader.onload = (loaded) => {
-    // `string` here because we call `readAsText` below (don't love the api)
-    const parsed = JSON.parse(loaded.target.result as string)
+  const routesTable = new Routes.Table(
+    $<HTMLTableElement>("routes-table"),
+    settings.routes,
+    Object.keys(settings.islands),
+    onRouteSubmitButtonClicked,
+    onRouteDeleteButtonClicked,
+  )
+  console.log(routesTable)
 
-    // TODO: valiadate JSON
-    browser.storage.local.set({
-      ...parsed,
-    })
+  new IO.ExportButton($<HTMLButtonElement>("export-button"), () =>
+    PageActions.exportSettings(),
+  )
 
-    document.getElementById("status").innerHTML = "Settings saved!"
-  }
-
-  reader.readAsText(file)
+  new IO.ImportInput(
+    $<HTMLInputElement>("import-input"),
+    onSettingsFileSelected,
+  )
 }
 
-document
-  .getElementById("settingsJSON")
-  .addEventListener("change", handleFiles, false)
+function $<T extends HTMLElement>(id: string): T {
+  return <T>document.getElementById(id)
+}
+
+function onIslandSubmitButtonClicked(
+  island: string,
+  ciDetails: ContextualIdentityDetails,
+) {
+  PageActions.createIsland(island, ciDetails).then((success) => {
+    if (success) {
+      PageActions.reloadPage()
+    }
+  })
+}
+
+function onIslandDeleteButtonClicked(
+  island: string,
+  ciDetails: ContextualIdentityDetails,
+) {
+  PageActions.deleteIsland(island).then((success) => {
+    if (success) {
+      PageActions.reloadPage()
+    }
+  })
+}
+
+function onRouteSubmitButtonClicked(urlFragment: string, island: string) {
+  PageActions.createRoute(urlFragment, island).then((success) => {
+    if (success) {
+      PageActions.reloadPage()
+    }
+  })
+}
+
+function onRouteDeleteButtonClicked(urlFragment: string, island: string) {
+  PageActions.deleteRoute(urlFragment).then((success) => {
+    if (success) {
+      PageActions.reloadPage()
+    }
+  })
+}
+
+function onSettingsFileSelected(file: File) {
+  PageActions.importSettingsFromFile(file).then((success) => {
+    if (success) {
+      PageActions.reloadPage()
+    }
+  })
+}
+
+renderPage().then(() => console.log("Page render complete"))

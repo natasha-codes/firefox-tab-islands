@@ -17,6 +17,7 @@
   "permissions": [
     "contextualIdentities",
     "cookies",
+    "downloads",
     "tabs",
     "storage",
     "<all_urls>",

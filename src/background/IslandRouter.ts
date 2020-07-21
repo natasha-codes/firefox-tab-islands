@@ -1,5 +1,5 @@
 import { Constants } from "../Constants"
-import { CookieStoreId, SettingsManager } from "./SettingsManager"
+import { CookieStoreId, CookieStoreManager } from "./CookieStoreManager"
 
 /**
  * `IslandRouter` listens for "main frame" web requests (requests
@@ -14,7 +14,7 @@ import { CookieStoreId, SettingsManager } from "./SettingsManager"
 export class IslandRouter {
   public static shared: IslandRouter = new IslandRouter()
 
-  private constructor() { }
+  private constructor() {}
 
   public attach() {
     const requestFilters: browser.webRequest.RequestFilter = {
@@ -56,7 +56,7 @@ export class IslandRouter {
     details: RequestDetails,
   ): Promise<null | CookieStoreId> {
     const mappedRequestCookieStore =
-      SettingsManager.shared.getMappedCookieStoreForUrl(details.url) ??
+      CookieStoreManager.shared.getCookieStoreForUrl(details.url) ??
       Constants.defaultCookieStoreId
 
     if (!details.cookieStoreId) {
@@ -87,7 +87,7 @@ export class IslandRouter {
 
       // Don't await, if this fails that's okay
       this.tabWithIdIsDiscardable(details.tabId).then(
-        isDiscardable => isDiscardable && this.closeTabWithId(details.tabId),
+        (isDiscardable) => isDiscardable && this.closeTabWithId(details.tabId),
       )
     }
 
@@ -96,7 +96,7 @@ export class IslandRouter {
 
   private async tabWithIdIsDiscardable(tabId: number): Promise<boolean> {
     return browser.tabs.get(tabId).then(
-      ({url}) =>
+      ({ url }) =>
         Constants.defaultDiscardableTabs.has(url) ||
         // TODO: query settings for discardables
         /moz-extension.*public\/index.html/.test(url),

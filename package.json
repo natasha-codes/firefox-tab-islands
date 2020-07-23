@@ -1,6 +1,6 @@
 {
   "name": "firefox-tab-islands",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A Firefox extension to automatically isolate logins and web trackers.",
   "repository": "git@github.com:natasha-codes/firefox-tab-islands.git",
   "author": "natasha-codes <https://github.com/natasha-codes>",

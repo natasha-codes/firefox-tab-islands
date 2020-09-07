@@ -77,6 +77,7 @@ export class IslandRouter {
     islandCookieStore: CookieStoreId,
   ): Promise<browser.tabs.Tab> {
     const tabCreationDetails: TabCreationDetails = {
+      active: false,
       url: details.url,
       cookieStoreId: islandCookieStore,
     }
@@ -122,6 +123,7 @@ interface RequestDetails {
 interface TabCreationDetails {
   url: string
   index?: number
+  active?: boolean
   cookieStoreId: CookieStoreId
 }
 

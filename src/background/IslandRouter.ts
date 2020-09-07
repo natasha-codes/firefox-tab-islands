@@ -100,7 +100,9 @@ export class IslandRouter {
       ({ url }) =>
         Constants.defaultDiscardableTabs.has(url) ||
         // TODO: query settings for discardables
-        /moz-extension.*public\/index.html/.test(url),
+        Constants.defaultDiscardablePatterns.some((pattern) =>
+          pattern.test(url),
+        ),
     )
   }
 

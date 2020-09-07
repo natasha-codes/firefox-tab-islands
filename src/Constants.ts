@@ -7,4 +7,8 @@ export class Constants {
     "about:home",
     "about:blank",
   ])
+  static defaultDiscardablePatterns: Array<RegExp> = [
+    /moz-extension.*public\/index.html/,
+    /www.google.com\/url\?.*/,
+  ]
 }
